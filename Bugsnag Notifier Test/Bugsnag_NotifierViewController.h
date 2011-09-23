@@ -10,7 +10,7 @@
 
 @interface Bugsnag_NotifierViewController : UIViewController
 
--(IBAction) generateException;
--(IBAction) generateSignal;
+-(IBAction) generateException:(UIButton*)sender;
+-(IBAction) generateSignal:(UIButton*)sender;
 
 @end

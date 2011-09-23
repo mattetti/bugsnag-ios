@@ -10,12 +10,13 @@
 		93F1E929142C5662005A297C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F1E928142C5662005A297C /* UIKit.framework */; };
 		93F1E92B142C5662005A297C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F1E92A142C5662005A297C /* Foundation.framework */; };
 		93F1E92D142C5662005A297C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F1E92C142C5662005A297C /* CoreGraphics.framework */; };
-		93F1E933142C5662005A297C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E931142C5662005A297C /* InfoPlist.strings */; };
-		93F1E935142C5662005A297C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E934142C5662005A297C /* main.m */; };
-		93F1E939142C5662005A297C /* Bugsnag_NotifierAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E938142C5662005A297C /* Bugsnag_NotifierAppDelegate.m */; };
-		93F1E93C142C5662005A297C /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E93A142C5662005A297C /* MainWindow.xib */; };
-		93F1E93F142C5662005A297C /* Bugsnag_NotifierViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E93E142C5662005A297C /* Bugsnag_NotifierViewController.m */; };
-		93F1E942142C5662005A297C /* Bugsnag_NotifierViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E940142C5662005A297C /* Bugsnag_NotifierViewController.xib */; };
+		93F1E954142C59EA005A297C /* Bugsnag_NotifierAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E951142C59EA005A297C /* Bugsnag_NotifierAppDelegate.m */; };
+		93F1E955142C59EA005A297C /* Bugsnag_NotifierViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E953142C59EA005A297C /* Bugsnag_NotifierViewController.m */; };
+		93F1E95B142C5A07005A297C /* Bugsnag_NotifierViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E957142C5A07005A297C /* Bugsnag_NotifierViewController.xib */; };
+		93F1E95C142C5A07005A297C /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E959142C5A07005A297C /* MainWindow.xib */; };
+		93F1E95F142C5A15005A297C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E95D142C5A15005A297C /* InfoPlist.strings */; };
+		93F1E961142C5A22005A297C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E960142C5A22005A297C /* main.m */; };
+		93F1E967142C5A49005A297C /* Bugsnag.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E966142C5A49005A297C /* Bugsnag.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,16 +24,18 @@
 		93F1E928142C5662005A297C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		93F1E92A142C5662005A297C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		93F1E92C142C5662005A297C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		93F1E930142C5662005A297C /* Bugsnag Notifier-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Bugsnag Notifier-Info.plist"; sourceTree = "<group>"; };
-		93F1E932142C5662005A297C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		93F1E934142C5662005A297C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		93F1E936142C5662005A297C /* Bugsnag Notifier-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bugsnag Notifier-Prefix.pch"; sourceTree = "<group>"; };
-		93F1E937142C5662005A297C /* Bugsnag_NotifierAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bugsnag_NotifierAppDelegate.h; sourceTree = "<group>"; };
-		93F1E938142C5662005A297C /* Bugsnag_NotifierAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Bugsnag_NotifierAppDelegate.m; sourceTree = "<group>"; };
-		93F1E93B142C5662005A297C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
-		93F1E93D142C5662005A297C /* Bugsnag_NotifierViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bugsnag_NotifierViewController.h; sourceTree = "<group>"; };
-		93F1E93E142C5662005A297C /* Bugsnag_NotifierViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Bugsnag_NotifierViewController.m; sourceTree = "<group>"; };
-		93F1E941142C5662005A297C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/Bugsnag_NotifierViewController.xib; sourceTree = "<group>"; };
+		93F1E950142C59EA005A297C /* Bugsnag_NotifierAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bugsnag_NotifierAppDelegate.h; path = "Bugsnag Notifier Test/Bugsnag_NotifierAppDelegate.h"; sourceTree = SOURCE_ROOT; };
+		93F1E951142C59EA005A297C /* Bugsnag_NotifierAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Bugsnag_NotifierAppDelegate.m; path = "Bugsnag Notifier Test/Bugsnag_NotifierAppDelegate.m"; sourceTree = SOURCE_ROOT; };
+		93F1E952142C59EA005A297C /* Bugsnag_NotifierViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bugsnag_NotifierViewController.h; path = "Bugsnag Notifier Test/Bugsnag_NotifierViewController.h"; sourceTree = SOURCE_ROOT; };
+		93F1E953142C59EA005A297C /* Bugsnag_NotifierViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Bugsnag_NotifierViewController.m; path = "Bugsnag Notifier Test/Bugsnag_NotifierViewController.m"; sourceTree = SOURCE_ROOT; };
+		93F1E958142C5A07005A297C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "Bugsnag Notifier Test/en.lproj/Bugsnag_NotifierViewController.xib"; sourceTree = SOURCE_ROOT; };
+		93F1E95A142C5A07005A297C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "Bugsnag Notifier Test/en.lproj/MainWindow.xib"; sourceTree = SOURCE_ROOT; };
+		93F1E95E142C5A15005A297C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bugsnag Notifier Test/en.lproj/InfoPlist.strings"; sourceTree = SOURCE_ROOT; };
+		93F1E960142C5A22005A297C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Bugsnag Notifier Test/main.m"; sourceTree = SOURCE_ROOT; };
+		93F1E962142C5A30005A297C /* Bugsnag Notifier-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Bugsnag Notifier-Info.plist"; path = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist"; sourceTree = SOURCE_ROOT; };
+		93F1E963142C5A30005A297C /* Bugsnag Notifier-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Bugsnag Notifier-Prefix.pch"; path = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		93F1E965142C5A49005A297C /* Bugsnag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bugsnag.h; sourceTree = SOURCE_ROOT; };
+		93F1E966142C5A49005A297C /* Bugsnag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Bugsnag.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,7 +55,8 @@
 		93F1E919142C5662005A297C = {
 			isa = PBXGroup;
 			children = (
-				93F1E92E142C5662005A297C /* Bugsnag Notifier */,
+				93F1E968142C5A60005A297C /* Bugsnag Notifier */,
+				93F1E92E142C5662005A297C /* Bugsnag Notifier Test */,
 				93F1E927142C5662005A297C /* Frameworks */,
 				93F1E925142C5662005A297C /* Products */,
 			);
@@ -76,29 +80,39 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		93F1E92E142C5662005A297C /* Bugsnag Notifier */ = {
+		93F1E92E142C5662005A297C /* Bugsnag Notifier Test */ = {
 			isa = PBXGroup;
 			children = (
-				93F1E937142C5662005A297C /* Bugsnag_NotifierAppDelegate.h */,
-				93F1E938142C5662005A297C /* Bugsnag_NotifierAppDelegate.m */,
-				93F1E93A142C5662005A297C /* MainWindow.xib */,
-				93F1E93D142C5662005A297C /* Bugsnag_NotifierViewController.h */,
-				93F1E93E142C5662005A297C /* Bugsnag_NotifierViewController.m */,
-				93F1E940142C5662005A297C /* Bugsnag_NotifierViewController.xib */,
+				93F1E957142C5A07005A297C /* Bugsnag_NotifierViewController.xib */,
+				93F1E959142C5A07005A297C /* MainWindow.xib */,
+				93F1E950142C59EA005A297C /* Bugsnag_NotifierAppDelegate.h */,
+				93F1E951142C59EA005A297C /* Bugsnag_NotifierAppDelegate.m */,
+				93F1E952142C59EA005A297C /* Bugsnag_NotifierViewController.h */,
+				93F1E953142C59EA005A297C /* Bugsnag_NotifierViewController.m */,
 				93F1E92F142C5662005A297C /* Supporting Files */,
 			);
+			name = "Bugsnag Notifier Test";
 			path = "Bugsnag Notifier";
 			sourceTree = "<group>";
 		};
 		93F1E92F142C5662005A297C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				93F1E930142C5662005A297C /* Bugsnag Notifier-Info.plist */,
-				93F1E931142C5662005A297C /* InfoPlist.strings */,
-				93F1E934142C5662005A297C /* main.m */,
-				93F1E936142C5662005A297C /* Bugsnag Notifier-Prefix.pch */,
+				93F1E95D142C5A15005A297C /* InfoPlist.strings */,
+				93F1E962142C5A30005A297C /* Bugsnag Notifier-Info.plist */,
+				93F1E963142C5A30005A297C /* Bugsnag Notifier-Prefix.pch */,
+				93F1E960142C5A22005A297C /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		93F1E968142C5A60005A297C /* Bugsnag Notifier */ = {
+			isa = PBXGroup;
+			children = (
+				93F1E965142C5A49005A297C /* Bugsnag.h */,
+				93F1E966142C5A49005A297C /* Bugsnag.m */,
+			);
+			name = "Bugsnag Notifier";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,7 +140,7 @@
 /* Begin PBXProject section */
 		93F1E91B142C5662005A297C /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = 93F1E91E142C5662005A297C /* Build configuration list for PBXProject "Bugsnag Notifier" */;
+			buildConfigurationList = 93F1E91E142C5662005A297C /* Build configuration list for PBXProject "Bugsnag Notifier Test" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -148,9 +162,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				93F1E933142C5662005A297C /* InfoPlist.strings in Resources */,
-				93F1E93C142C5662005A297C /* MainWindow.xib in Resources */,
-				93F1E942142C5662005A297C /* Bugsnag_NotifierViewController.xib in Resources */,
+				93F1E95B142C5A07005A297C /* Bugsnag_NotifierViewController.xib in Resources */,
+				93F1E95C142C5A07005A297C /* MainWindow.xib in Resources */,
+				93F1E95F142C5A15005A297C /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,37 +175,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				93F1E935142C5662005A297C /* main.m in Sources */,
-				93F1E939142C5662005A297C /* Bugsnag_NotifierAppDelegate.m in Sources */,
-				93F1E93F142C5662005A297C /* Bugsnag_NotifierViewController.m in Sources */,
+				93F1E954142C59EA005A297C /* Bugsnag_NotifierAppDelegate.m in Sources */,
+				93F1E955142C59EA005A297C /* Bugsnag_NotifierViewController.m in Sources */,
+				93F1E961142C5A22005A297C /* main.m in Sources */,
+				93F1E967142C5A49005A297C /* Bugsnag.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		93F1E931142C5662005A297C /* InfoPlist.strings */ = {
+		93F1E957142C5A07005A297C /* Bugsnag_NotifierViewController.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				93F1E932142C5662005A297C /* en */,
+				93F1E958142C5A07005A297C /* en */,
 			);
-			name = InfoPlist.strings;
+			name = Bugsnag_NotifierViewController.xib;
 			sourceTree = "<group>";
 		};
-		93F1E93A142C5662005A297C /* MainWindow.xib */ = {
+		93F1E959142C5A07005A297C /* MainWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				93F1E93B142C5662005A297C /* en */,
+				93F1E95A142C5A07005A297C /* en */,
 			);
 			name = MainWindow.xib;
 			sourceTree = "<group>";
 		};
-		93F1E940142C5662005A297C /* Bugsnag_NotifierViewController.xib */ = {
+		93F1E95D142C5A15005A297C /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				93F1E941142C5662005A297C /* en */,
+				93F1E95E142C5A15005A297C /* en */,
 			);
-			name = Bugsnag_NotifierViewController.xib;
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -244,8 +259,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Bugsnag Notifier/Bugsnag Notifier-Prefix.pch";
-				INFOPLIST_FILE = "Bugsnag Notifier/Bugsnag Notifier-Info.plist";
+				GCC_PREFIX_HEADER = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch";
+				INFOPLIST_FILE = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -255,8 +270,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Bugsnag Notifier/Bugsnag Notifier-Prefix.pch";
-				INFOPLIST_FILE = "Bugsnag Notifier/Bugsnag Notifier-Info.plist";
+				GCC_PREFIX_HEADER = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch";
+				INFOPLIST_FILE = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -265,7 +280,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		93F1E91E142C5662005A297C /* Build configuration list for PBXProject "Bugsnag Notifier" */ = {
+		93F1E91E142C5662005A297C /* Build configuration list for PBXProject "Bugsnag Notifier Test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				93F1E943142C5662005A297C /* Debug */,
@@ -281,6 +296,7 @@
 				93F1E947142C5662005A297C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

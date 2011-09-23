@@ -18,6 +18,14 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+- (IBAction)generateSignal:(UIButton *)sender {
+    
+}
+
+- (IBAction)generateException:(UIButton *)sender {
+    
+}
+
 #pragma mark - View lifecycle
 
 /*
