@@ -19,11 +19,11 @@
 }
 
 - (IBAction)generateSignal:(UIButton *)sender {
-    
+    raise(SIGABRT);
 }
 
 - (IBAction)generateException:(UIButton *)sender {
-    
+    [NSException raise:@"BugsnagException" format:@"Test exception."];
 }
 
 #pragma mark - View lifecycle
