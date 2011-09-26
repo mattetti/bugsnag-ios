@@ -374,8 +374,6 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
         [connection cancel];
         NSLog(@"Bad response from bugnsag received: %d.", statusCode);
         self.data = nil;
-        //TODO REMOVE ME
-        deleteCachedReports();
     }
 }
 
