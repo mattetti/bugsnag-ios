@@ -19,7 +19,7 @@
 }
 
 - (IBAction)generateSignal:(UIButton *)sender {
-    raise(SIGABRT);
+    raise(SIGSEGV);
 }
 
 - (IBAction)generateException:(UIButton *)sender {

@@ -12,9 +12,14 @@
 #import <sys/sysctl.h>
 
 #import <Foundation/Foundation.h>
+#import <mach/mach.h>
 
 #import "SBJson.h"
 #import "Bugsnag.h"
+
+#define BUGSNAG_ENDPOINT @"http://api.bugsnag.com/notify"
+#define BUGSNAG_IOS_VERSION @"1.0.0"
+#define BUGSNAG_IOS_HOMEPAGE @"http://www.bugsnag.com"
 
 @interface Bugsnag ()
 - (id) initWithAPIKey:(NSString*)apiKey andReleaseStage:(NSString*)releaseStage;
@@ -39,12 +44,13 @@ int signals[] = {
 	SIGFPE,
 	SIGILL,
 	SIGSEGV,
-	SIGTRAP
+	SIGTRAP,
+    EXC_BAD_ACCESS,
 };
 
-void handle_signal(int, siginfo_t *, void *);
+void handle_signal(int);
 void handle_exception(NSException *);
-NSArray *getCallStackFromFrames(void *frames, int count);
+NSArray *getCallStackFromFrames(void *, int);
 NSArray *getOutstandingErrorFilenames(void);
 NSString *generateBugsnagReportFilename(void);
 NSString *getPlatform(void);
@@ -53,7 +59,7 @@ NSString *getOSVersion(void);
 NSString *generateBugsnagReportPath(void);
 NSString *getBugsnagPayload(void);
 void deleteCachedReports(void);
-void saveError(NSString *name, NSString *message, NSArray *rawStacktrace);
+void saveError(NSString *, NSString *, NSArray *);
 
 // Deletes all the cached reports. Only call after we've sent them!
 void deleteCachedReports(void) {
@@ -63,7 +69,6 @@ void deleteCachedReports(void) {
 // Gets the JSON payload that represents the currently cached errors
 NSString *getBugsnagPayload(void) {
     NSArray *errorFiles = getOutstandingErrorFilenames();
-    NSLog(@"%d error file(s) found!", [errorFiles count]);
     if ( [errorFiles count] > 0 ) {
         for ( NSString *file in errorFiles ) {
             [(NSMutableArray*)[sharedBugsnagNotifier.bugsnagPayload objectForKey:@"errors"] addObject:[NSMutableDictionary dictionaryWithContentsOfFile:file]];
@@ -158,7 +163,6 @@ NSArray *getCallStackFromFrames(void *frames, int count) {
 	NSMutableArray *backtrace = [NSMutableArray arrayWithCapacity:count];
 	for (NSInteger i = 0; i < count; i++) {
 		NSString *entry = [NSString stringWithUTF8String:strs[i]];
-        NSLog(@"Stack: %@",entry);
 		[backtrace addObject:entry];
 	}
 	free(strs);
@@ -166,17 +170,24 @@ NSArray *getCallStackFromFrames(void *frames, int count) {
 }
 
 // Handles a raised signal
-void handle_signal(int signal, siginfo_t *info, void *context) {    
+void handle_signal(int signalReceived) {
     if (sharedBugsnagNotifier) {
+        for (NSUInteger i = 0; i < signals_count; i++) {
+            int signalType = signals[i];
+            signal(signalType, NULL);
+        }
+        
         // We limit to 128 lines of trace information for signals atm
         int count = 128;
 		void *frames[count];
 		count = backtrace(frames, count);
 
-        saveError([NSString stringWithCString:strsignal(signal) encoding:NSUTF8StringEncoding], 
+        saveError([NSString stringWithCString:strsignal(signalReceived) encoding:NSUTF8StringEncoding], 
                   @"", 
                   getCallStackFromFrames(frames,count));
     }
+    //Propagate the signal back up to take the app down
+    raise(signalReceived);
 }
 
 // Handles an uncaught exception
@@ -207,39 +218,29 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
     [cause setObject:message forKey:@"message"];
     
     //TODO: Long term this can be optimised to one regex when I know how to get all the bits in one go!
-    NSRegularExpression *methodRegex = [NSRegularExpression regularExpressionWithPattern:@"0x[0-9A-Fa-f]{8} ([+-].+?]|[A-Za-z0-9_]+)" //@"0x[0-9A-Fa-f]{8} (?:([+-]\[.+?\])|([A-Za-z0-9_]+))"
-                                                                                 options:NSRegularExpressionCaseInsensitive 
-                                                                                   error:nil];
-    NSRegularExpression *lineNumberRegex = [NSRegularExpression regularExpressionWithPattern:@"THISWILLNEVERMATCH" 
+    NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
                                                                                      options:NSRegularExpressionCaseInsensitive 
                                                                                        error:nil];
-    NSRegularExpression *fileRegex = [NSRegularExpression regularExpressionWithPattern:@"THISWILLNEVERMATCH" 
-                                                                               options:NSRegularExpressionCaseInsensitive 
-                                                                                 error:nil];
 
     NSMutableArray *stacktrace = [[NSMutableArray alloc] initWithCapacity:[rawStacktrace count]];
     for (NSString *stackLine in rawStacktrace) {
         NSMutableDictionary *lineDetails = [[NSMutableDictionary alloc] initWithCapacity:3];
         NSRange fullRange = NSMakeRange(0, [stackLine length]);
         
-        NSTextCheckingResult* firstMatch = [methodRegex firstMatchInString:stackLine options:0 range:fullRange];
+        NSTextCheckingResult* firstMatch = [stacktraceRegex firstMatchInString:stackLine options:0 range:fullRange];
         if (firstMatch) {
-            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] forKey:@"method"];
+            NSString *packageName = [[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
+                [lineDetails setObject:@"true" forKey:@"inPackage"];
+            } else {
+                [lineDetails setObject:@"false" forKey:@"inPackage"];
+            }
+            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:3]] forKey:@"method"];
+            [lineDetails setObject:packageName forKey:@"file"];
+            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:2]] forKey:@"lineNumber"];
         } else {
             [lineDetails setObject:@"UnknownMethod" forKey:@"method"];
-        }
-        
-        firstMatch = [lineNumberRegex firstMatchInString:stackLine options:0 range:fullRange];
-        if (firstMatch) {
-            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] forKey:@"lineNumber"];
-        } else {
             [lineDetails setObject:@"UnknownLineNumber" forKey:@"lineNumber"];
-        }
-        
-        firstMatch = [fileRegex firstMatchInString:stackLine options:0 range:fullRange];
-        if (firstMatch) {
-            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] forKey:@"file"];
-        } else {
             [lineDetails setObject:@"UnknownFile" forKey:@"file"];
         }
         
@@ -294,13 +295,9 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
         NSSetUncaughtExceptionHandler(&handle_exception);
         
         for (NSUInteger i = 0; i < signals_count; i++) {
-            int signal = signals[i];
-            struct sigaction action;
-            sigemptyset(&action.sa_mask);
-            action.sa_flags = SA_SIGINFO;
-            action.sa_sigaction = handle_signal;
-            if (sigaction(signal, &action, NULL)) {
-                NSLog(@"Unable to register signal handler for %s", strsignal(signal));
+            int signalType = signals[i];
+            if (signal(signalType, handle_signal) != 0) {
+                NSLog(@"Unable to register signal handler for %s", strsignal(signalType));
             }
         }
 	}
@@ -328,7 +325,7 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
 // Internal init function. Sets up the class nicely
 - (id) initWithAPIKey:(NSString*)apiKey andReleaseStage:(NSString*)releaseStage {
     if ((self = [super init])) {
-        NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: @"iOS Bugsnag Notifier", @"1.0.0", @"http://www.bugsnag.com", nil] 
+        NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: @"iOS Bugsnag Notifier", BUGSNAG_IOS_VERSION, BUGSNAG_IOS_HOMEPAGE, nil] 
                                                                forKeys:[NSArray arrayWithObjects: @"name", @"version", @"url", nil]];
         
         self.bugsnagPayload = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: notifier, [NSString stringWithString:apiKey], [[NSMutableArray alloc] init], nil] 
@@ -375,7 +372,7 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
     int statusCode = [((NSHTTPURLResponse *)response) statusCode];
     if (statusCode != 200) {
         [connection cancel];
-        NSLog(@"Bad response.");
+        NSLog(@"Bad response from bugnsag received: %d.", statusCode);
         self.data = nil;
         //TODO REMOVE ME
         deleteCachedReports();
@@ -401,10 +398,9 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
             if ( payload ) {
                 sharedBugsnagNotifier.data = [NSMutableData data];
                 
-                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://api.bugsnag.com/notify"]];
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:BUGSNAG_ENDPOINT]];
                 
                 [request setHTTPMethod:@"POST"];
-                NSLog(@"Sending JSON: %@",payload);
                 [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
                 [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
                 [[NSURLConnection alloc] initWithRequest:request delegate:sharedBugsnagNotifier];
