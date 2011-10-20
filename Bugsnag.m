@@ -217,7 +217,6 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
     [cause setObject:name forKey:@"errorClass"];
     [cause setObject:message forKey:@"message"];
     
-    //TODO: Long term this can be optimised to one regex when I know how to get all the bits in one go!
     NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
                                                                                      options:NSRegularExpressionCaseInsensitive 
                                                                                        error:nil];
