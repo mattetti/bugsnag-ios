@@ -230,9 +230,9 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
         if (firstMatch) {
             NSString *packageName = [[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
-                [lineDetails setObject:@"true" forKey:@"inPackage"];
+                [lineDetails setObject:@"true" forKey:@"inProject"];
             } else {
-                [lineDetails setObject:@"false" forKey:@"inPackage"];
+                [lineDetails setObject:@"false" forKey:@"inProject"];
             }
             [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:3]] forKey:@"method"];
             [lineDetails setObject:packageName forKey:@"file"];
