@@ -3,7 +3,7 @@
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 9/22/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Bugsnag. All rights reserved.
 //
 
 #import <execinfo.h>
