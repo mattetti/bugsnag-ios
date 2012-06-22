@@ -1,24 +1,25 @@
-//
-//  Bugsnag_NotifierViewController.h
-//  Bugsnag Notifier
-//
-//  Created by Simon Maynard on 9/22/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
-//
-
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 @interface Bugsnag : NSObject {
     @private
-    NSMutableDictionary *_bugsnagPayload;
-    NSMutableDictionary *_applicationData;
-    NSMutableDictionary *_metaData;
-    NSString *_filename;
+    NSString *_appVersion;
     NSString *_userId;
-    NSMutableData *_data;
+    NSString *_errorPath;
+    NSString *_context;
+    NSMutableArray *_outstandingReports;
 }
 
-+ (void) startBugsnagWithApiKey:(NSString*)apiKey andReleaseStage:(NSString*)releaseStage;
-+ (void) setUserId:(NSString*)userId;
-+ (void) setAppVersion:(NSString*)appVersion;
++ (void) startBugsnagWithApiKey:(NSString*)apiKey;
++ (Bugsnag *)instance;
+
+@property (nonatomic, copy) NSString *userId;
+@property (nonatomic, copy) NSString *appVersion;
+@property (nonatomic, copy) NSString *releaseStage;
+@property (nonatomic, copy) NSString *context;
+@property (nonatomic, copy) NSString *apiKey;
+@property (nonatomic) BOOL enableSSL;
+@property (nonatomic) BOOL autoNotify;
+@property (nonatomic, retain) NSArray *notifyReleaseStages;
+@property (nonatomic, retain) NSDictionary *extraData;
+@property (nonatomic, retain) NSArray *dataFilters;
 @end

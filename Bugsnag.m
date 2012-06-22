@@ -1,11 +1,3 @@
-//
-//  Bugsnag_NotifierViewController.m
-//  Bugsnag Notifier
-//
-//  Created by Simon Maynard on 9/22/11.
-//  Copyright 2011 Bugsnag. All rights reserved.
-//
-
 #import <execinfo.h>
 #import <fcntl.h>
 #import <unistd.h>
@@ -17,21 +9,19 @@
 #import "SBJson.h"
 #import "Bugsnag.h"
 
-#define BUGSNAG_ENDPOINT @"http://api.bugsnag.com/notify"
-#define BUGSNAG_IOS_VERSION @"1.0.0"
-#define BUGSNAG_IOS_HOMEPAGE @"http://www.bugsnag.com"
-
 @interface Bugsnag ()
-- (id) initWithAPIKey:(NSString*)apiKey andReleaseStage:(NSString*)releaseStage;
-- (void)sendReports;
-- (void)registerNotifications;
-- (void)unregisterNotifications;
+- (id) initWithAPIKey:(NSString*)apiKey;
+- (void)sendCachedReports;
+- (void)saveErrorWithClass:(NSString*)errorClass andMessage:(NSString*) errorMessage andStackTrace:(NSArray*) rawStacktrace;
++ (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count;
+- (UIViewController *)getVisibleViewController;
+- (BOOL) shouldAutoNotify;
 
-@property (nonatomic, retain) NSMutableDictionary *bugsnagPayload;
-@property (nonatomic, retain) NSMutableDictionary *applicationData;
-@property (nonatomic, retain) NSMutableDictionary *metaData;
-@property (nonatomic, copy) NSString *filename;
-@property (nonatomic, copy) NSString *userId;
+@property (readonly) NSString *errorPath;
+@property (readonly) NSString *errorFilename;
+@property (readonly) NSString *osVersion;
+@property (readonly) NSString *platform;
+@property (readonly) NSArray *outstandingReports;
 @property (nonatomic, retain) NSMutableData *data;
 @end
 
@@ -44,112 +34,218 @@ int signals[] = {
 	SIGFPE,
 	SIGILL,
 	SIGSEGV,
-	SIGTRAP,
     EXC_BAD_ACCESS,
 };
 
+void remove_handlers(void);
 void handle_signal(int);
 void handle_exception(NSException *);
-NSArray *getCallStackFromFrames(void *, int);
-NSArray *getOutstandingErrorFilenames(void);
-NSString *generateBugsnagReportFilename(void);
-NSString *getPlatform(void);
-NSString *getAppVersion(void);
-NSString *getOSVersion(void);
-NSString *generateBugsnagReportPath(void);
-NSString *getBugsnagPayload(void);
-void deleteCachedReports(void);
-void saveError(NSString *, NSString *, NSArray *);
 
-// Deletes all the cached reports. Only call after we've sent them!
-void deleteCachedReports(void) {
-    [[NSFileManager defaultManager] removeItemAtPath:generateBugsnagReportPath() error:nil];
-}
-
-// Gets the JSON payload that represents the currently cached errors
-NSString *getBugsnagPayload(void) {
-    NSArray *errorFiles = getOutstandingErrorFilenames();
-    if ( [errorFiles count] > 0 ) {
-        for ( NSString *file in errorFiles ) {
-            [(NSMutableArray*)[sharedBugsnagNotifier.bugsnagPayload objectForKey:@"errors"] addObject:[NSMutableDictionary dictionaryWithContentsOfFile:file]];
-        }
-        return [sharedBugsnagNotifier.bugsnagPayload JSONRepresentation];
+void remove_handlers() {
+    for (NSUInteger i = 0; i < signals_count; i++) {
+        int signalType = signals[i];
+        signal(signalType, NULL);
     }
-    return nil;
+    NSSetUncaughtExceptionHandler(NULL);
 }
 
-// Retrieves the filenames of any outstanding errors
-NSArray *getOutstandingErrorFilenames(void) {
-    NSString *path = generateBugsnagReportPath();
-	NSArray *directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:nil];
-	NSMutableArray *crashes = [NSMutableArray arrayWithCapacity:[directoryContents count]];
-	for (NSString *file in directoryContents) {
-		if ([[file pathExtension] isEqualToString:@"bugsnag"]) {
-			NSString *crashPath = [path stringByAppendingPathComponent:file];
-			[crashes addObject:crashPath];
-		}
-	}
-	return crashes;
+// Handles a raised signal
+void handle_signal(int signalReceived) {
+    if (sharedBugsnagNotifier && [sharedBugsnagNotifier shouldAutoNotify]) {
+        remove_handlers();
+        
+        // We limit to 128 lines of trace information for signals atm
+        int count = 128;
+		void *frames[count];
+		count = backtrace(frames, count);
+
+        [sharedBugsnagNotifier saveErrorWithClass:[NSString stringWithCString:strsignal(signalReceived) encoding:NSUTF8StringEncoding] 
+                                       andMessage:@"" 
+                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:count]];
+    }
+    //Propagate the signal back up to take the app down
+    raise(signalReceived);
 }
 
-// Generates the path used to store the error reports
-NSString *generateBugsnagReportPath(void) {
-    NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-	NSString *filename = [folders count] == 0 ? NSTemporaryDirectory() : [folders objectAtIndex:0];
-	return [filename stringByAppendingPathComponent:@"bugsnag"];
+// Handles an uncaught exception
+void handle_exception(NSException *exception) {
+    if (sharedBugsnagNotifier && [sharedBugsnagNotifier shouldAutoNotify]) {
+        remove_handlers();
+        
+        NSUInteger frameCount = [[exception callStackReturnAddresses] count];
+        void *frames[frameCount];
+        for (NSInteger i = 0; i < frameCount; i++) {
+            frames[i] = (void *)[[[exception callStackReturnAddresses] objectAtIndex:i] unsignedIntegerValue];
+        }
+        
+        [sharedBugsnagNotifier saveErrorWithClass:[exception name] 
+                                       andMessage:[exception reason] 
+                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:frameCount]];
+    }
 }
 
-// Generates a GUID filename to store an error in
-NSString *generateBugsnagReportFilename(void) {
-	NSString *filename = generateBugsnagReportPath();
-    filename = [filename stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];
-    return [filename stringByAppendingPathExtension:@"bugsnag"];
-}
+@implementation Bugsnag
 
-// Gets a textual representation of the current platform
-NSString *getPlatform(void) {
-#if TARGET_IPHONE_SIMULATOR
-	return @"iPhone Simulator";
+@synthesize releaseStage;
+@synthesize data;
+@synthesize apiKey;
+@synthesize enableSSL;
+@synthesize autoNotify;
+@synthesize extraData;
+@synthesize dataFilters;
+@synthesize notifyReleaseStages;
+
+#ifdef DEBUG
+#   define BugLog(__FORMAT__, ...) NSLog(__FORMAT__, ##__VA_ARGS__)
+#else
+#   define BugLog(...) do {} while (0)
 #endif
+
+#define BUGSNAG_IOS_VERSION @"1.0.0"
+#define BUGSNAG_IOS_HOMEPAGE @"https://github.com/bugsnag/bugsnag-ios"
+
+// The start function. Entry point that should be called early on in application load
++ (void) startBugsnagWithApiKey:(NSString*)apiKey {
+    if (!sharedBugsnagNotifier) {
+		if (!apiKey || ![apiKey length]) {
+            BugLog(@"APIKey cannot be empty");
+            return;
+		}
+        
+        sharedBugsnagNotifier = [[Bugsnag alloc] initWithAPIKey:apiKey];
+		
+        if (!sharedBugsnagNotifier) {
+            BugLog(@"Unable to alloc the notifier.");
+            return;
+        }
+        
+        NSSetUncaughtExceptionHandler(&handle_exception);
+        
+        for (NSUInteger i = 0; i < signals_count; i++) {
+            int signalType = signals[i];
+            if (signal(signalType, handle_signal) != 0) {
+                BugLog(@"Unable to register signal handler for %s", strsignal(signalType));
+            }
+        }
+        
+        [sharedBugsnagNotifier sendCachedReports];
+	}
+}
+
++ (Bugsnag *)instance {
+    return sharedBugsnagNotifier;
+}
+
+#pragma mark - Instance Methods
+- (id) initWithAPIKey:(NSString*)passedApiKey {
+    if ((self = [super init])) {
+        self.apiKey = passedApiKey;
+        _appVersion = nil;
+        _errorPath = nil;
+        _userId = nil;
+        _outstandingReports = nil;
+        self.enableSSL = NO;
+        self.autoNotify = YES;
+        [self.notifyReleaseStages = [[NSArray alloc] initWithObjects:@"production", nil] release];
+        [self.dataFilters = [[NSArray alloc] initWithObjects:@"password", nil] release];
+        
+#ifdef DEBUG
+        self.releaseStage = @"development";
+#else
+        self.releaseStage = @"production";
+#endif
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    }
+    return self;
+}
+
+- (BOOL) shouldAutoNotify {
+    return self.autoNotify && [self.notifyReleaseStages containsObject:self.releaseStage];
+}
+
+-(NSString*) platform {
     size_t size = 256;
 	char *machineCString = malloc(size);
     sysctlbyname("hw.machine", machineCString, &size, NULL, 0);
     NSString *machine = [NSString stringWithCString:machineCString encoding:NSUTF8StringEncoding];
     free(machineCString);
-    // iPhone
-	if ([machine isEqualToString:@"iPhone1,1"]) { return @"iPhone"; }
-	else if ([machine isEqualToString:@"iPhone1,2"]) { return @"iPhone 3G"; }
-	else if ([machine isEqualToString:@"iPhone2,1"]) { return @"iPhone 3GS"; }
-	else if ([machine isEqualToString:@"iPhone3,1"]) { return @"iPhone 4 (GSM)"; }
-    else if ([machine isEqualToString:@"iPhone3,3"]) { return @"iPhone 4 (CDMA)"; }
-	// iPad
-	else if ([machine isEqualToString:@"iPad1,1"]) { return @"iPad"; }
-    else if ([machine isEqualToString:@"iPad2,1"]) { return @"iPad 2 (WiFi)"; }
-    else if ([machine isEqualToString:@"iPad2,2"]) { return @"iPad 2 (GSM)"; }
-    else if ([machine isEqualToString:@"iPad2,3"]) { return @"iPad 2 (CDMA)"; }
-	// iPod
-	else if ([machine isEqualToString:@"iPod1,1"]) { return @"iPod Touch"; }
-	else if ([machine isEqualToString:@"iPod2,1"]) { return @"iPod Touch (2nd generation)"; }
-	else if ([machine isEqualToString:@"iPod3,1"]) { return @"iPod Touch (3rd generation)"; }
-	else if ([machine isEqualToString:@"iPod4,1"]) { return @"iPod Touch (4th generation)"; }
-	// Unknown
-	else { return machine; }
+    
+    if ([machine isEqualToString:@"iPhone1,1"])    return @"iPhone 1G";
+    if ([machine isEqualToString:@"iPhone1,2"])    return @"iPhone 3G";
+    if ([machine isEqualToString:@"iPhone2,1"])    return @"iPhone 3GS";
+    if ([machine isEqualToString:@"iPhone3,1"])    return @"iPhone 4";
+    if ([machine isEqualToString:@"iPhone3,3"])    return @"Verizon iPhone 4";
+    if ([machine isEqualToString:@"iPhone4,1"])    return @"iPhone 4S";
+    if ([machine isEqualToString:@"iPod1,1"])      return @"iPod Touch 1G";
+    if ([machine isEqualToString:@"iPod2,1"])      return @"iPod Touch 2G";
+    if ([machine isEqualToString:@"iPod3,1"])      return @"iPod Touch 3G";
+    if ([machine isEqualToString:@"iPod4,1"])      return @"iPod Touch 4G";
+    if ([machine isEqualToString:@"iPad1,1"])      return @"iPad";
+    if ([machine isEqualToString:@"iPad2,1"])      return @"iPad 2 (WiFi)";
+    if ([machine isEqualToString:@"iPad2,2"])      return @"iPad 2 (GSM)";
+    if ([machine isEqualToString:@"iPad2,3"])      return @"iPad 2 (CDMA)";
+    if ([machine isEqualToString:@"iPad2,4"])      return @"iPad 2";
+    if ([machine isEqualToString:@"iPad3,1"])      return @"iPad-3G (WiFi)";
+    if ([machine isEqualToString:@"iPad3,2"])      return @"iPad-3G (4G)";
+    if ([machine isEqualToString:@"iPad3,3"])      return @"iPad-3G (4G)";
+    if ([machine isEqualToString:@"i386"])         return @"Simulator";
+    if ([machine isEqualToString:@"x86_64"])       return @"Simulator";
+    
+    return machine;
 }
 
-// Gets the application version information
-NSString *getAppVersion(void) {
+- (NSString*) appVersion {
+    if(_appVersion) return [_appVersion copy];
     NSString *bundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 	NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 	if (bundleVersion != nil && versionString != nil) {
-		return [NSString stringWithFormat:@"%@ (%@)", versionString, bundleVersion];
-	}
-	else if (bundleVersion != nil) { return bundleVersion; }
-	else if (versionString != nil) { return versionString; }
-	else { return nil; }
+        _appVersion = [NSString stringWithFormat:@"%@ (%@)", versionString, bundleVersion];
+    } else if (bundleVersion != nil) {
+        _appVersion = bundleVersion;
+    } else if(versionString != nil) {
+        _appVersion = versionString;
+    }
+	return [_appVersion copy];
 }
 
-// Gets the OS version information
-NSString *getOSVersion(void) {
+- (void) setAppVersion:(NSString*)version {
+    if (_appVersion) [_appVersion release];
+    _appVersion = [[version copy] retain];
+}
+
+- (NSString*) userId {
+    if(_userId) return [_userId copy];
+    [[NSFileManager defaultManager] createDirectoryAtPath:sharedBugsnagNotifier.errorPath withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    NSString *userFilename = [[self.errorPath stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]] stringByAppendingPathExtension:@"userId"];
+    _userId = [NSString stringWithContentsOfFile:userFilename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+    if(_userId) return [_userId copy];
+    
+    CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+    _userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+    CFRelease(uuid);
+    
+    [_userId writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+    return [_userId copy];
+}
+
+- (void) setUserId:(NSString *)userId {
+    if(_userId) [_userId release];
+    _userId = [[userId copy] retain];
+}
+
+- (NSString*) context {
+    if(_context) return [_context copy];
+    return NSStringFromClass([[self getVisibleViewController] class]);
+}
+
+- (void) setContext:(NSString *)context {
+    if(_context) [_context release];
+    _context = [[_context copy] retain];
+}
+
+- (NSString *) osVersion {
 #if TARGET_IPHONE_SIMULATOR
 	return [[UIDevice currentDevice] systemVersion];
 #else
@@ -157,8 +253,99 @@ NSString *getOSVersion(void) {
 #endif
 }
 
-// Returns the call stack from the frame numbers. Uses the iOS format
-NSArray *getCallStackFromFrames(void *frames, int count) {
+- (NSString*) errorPath{
+    if(_errorPath) return _errorPath;
+    NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *filename = [folders count] == 0 ? NSTemporaryDirectory() : [folders objectAtIndex:0];
+    _errorPath = [[filename stringByAppendingPathComponent:@"bugsnag"] retain];
+    return _errorPath;
+}
+
+- (NSString *) errorFilename {
+    return [[self.errorPath stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]] stringByAppendingPathExtension:@"bugsnag"];
+}
+
+- (UIViewController *)getVisibleViewController {
+    UIViewController *viewController = nil;
+    UIViewController *visibleViewController = nil;
+    
+    if ([[[UIApplication sharedApplication] keyWindow].rootViewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navigationController = (UINavigationController *) [[UIApplication sharedApplication] keyWindow].rootViewController;
+        viewController = navigationController.visibleViewController;
+    }
+    else {
+        viewController = [[UIApplication sharedApplication] keyWindow].rootViewController;
+    }
+    
+    while (visibleViewController == nil) {
+        
+        if (viewController.modalViewController == nil) {
+            visibleViewController = viewController;  
+        } else {
+            
+            if ([viewController.modalViewController isKindOfClass:[UINavigationController class]]) {
+                UINavigationController *navigationController = (UINavigationController *)viewController.modalViewController;
+                viewController = navigationController.visibleViewController;
+            } else {
+                viewController = viewController.modalViewController;
+            }
+        }
+        
+    }
+    
+    return visibleViewController;
+}
+
+- (NSArray *) outstandingReports {
+    if(_outstandingReports) return _outstandingReports;
+	NSArray *directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.errorPath error:nil];
+	_outstandingReports = [[NSMutableArray arrayWithCapacity:[directoryContents count]] retain];
+	for (NSString *file in directoryContents) {
+		if ([[file pathExtension] isEqualToString:@"bugsnag"]) {
+			NSString *crashPath = [self.errorPath stringByAppendingPathComponent:file];
+			[_outstandingReports addObject:crashPath];
+		}
+	}
+	return _outstandingReports;
+}
+
+- (NSDictionary*) getNotifyPayload {
+    NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: @"iOS Bugsnag Notifier", BUGSNAG_IOS_VERSION, BUGSNAG_IOS_HOMEPAGE, nil] 
+                                                           forKeys:[NSArray arrayWithObjects: @"name", @"version", @"url", nil]];
+    NSMutableArray *events = [[NSMutableArray alloc] init];
+    NSDictionary *notifierPayload = [[[NSDictionary alloc] initWithObjectsAndKeys:notifier, @"notifier", self.apiKey, @"apiKey", events, @"events", nil] autorelease];
+    
+    [notifier release];
+    [events release];
+    return notifierPayload;
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notif {
+    [self sendCachedReports];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)passedData {
+    [self.data appendData:passedData];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    int statusCode = [((NSHTTPURLResponse *)response) statusCode];
+    if (statusCode != 200) {
+        [connection cancel];
+        BugLog(@"Bad response from bugnsag received: %d.", statusCode);
+        self.data = nil;
+    }
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    [[NSFileManager defaultManager] removeItemAtPath:self.errorPath error:nil];
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    self.data = nil;
+}
+
++ (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count {
 	char **strs = backtrace_symbols(frames, count);
 	NSMutableArray *backtrace = [NSMutableArray arrayWithCapacity:count];
 	for (NSInteger i = 0; i < count; i++) {
@@ -169,58 +356,28 @@ NSArray *getCallStackFromFrames(void *frames, int count) {
 	return backtrace;
 }
 
-// Handles a raised signal
-void handle_signal(int signalReceived) {
-    if (sharedBugsnagNotifier) {
-        for (NSUInteger i = 0; i < signals_count; i++) {
-            int signalType = signals[i];
-            signal(signalType, NULL);
-        }
-        
-        // We limit to 128 lines of trace information for signals atm
-        int count = 128;
-		void *frames[count];
-		count = backtrace(frames, count);
-
-        saveError([NSString stringWithCString:strsignal(signalReceived) encoding:NSUTF8StringEncoding], 
-                  @"", 
-                  getCallStackFromFrames(frames,count));
-    }
-    //Propagate the signal back up to take the app down
-    raise(signalReceived);
-}
-
-// Handles an uncaught exception
-void handle_exception(NSException *exception) {
-    if (sharedBugsnagNotifier) {
-        NSUInteger frameCount = [[exception callStackReturnAddresses] count];
-        void *frames[frameCount];
-        for (NSInteger i = 0; i < frameCount; i++) {
-            frames[i] = (void *)[[[exception callStackReturnAddresses] objectAtIndex:i] unsignedIntegerValue];
-        }
-        
-        saveError([exception name], [exception reason], getCallStackFromFrames(frames, frameCount));
-    }
-}
-
-// Creates an error from the provided information and saves it
-void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
-    NSMutableDictionary *error = [[NSMutableDictionary alloc] init];
+- (void) saveErrorWithClass:(NSString*)errorClass andMessage:(NSString*) errorMessage andStackTrace:(NSArray*) rawStacktrace {
+    NSMutableDictionary *event = [[NSMutableDictionary alloc] init];
     
-    [error setObject:sharedBugsnagNotifier.applicationData forKey:@"appEnvironment"];
-    [error setObject:sharedBugsnagNotifier.metaData forKey:@"metaData"];
-    [error setObject:sharedBugsnagNotifier.userId forKey:@"userId"];
+    [event setObject:self.userId forKey:@"userId"];
+    [event setObject:self.appVersion forKey:@"appVersion"];
+    [event setObject:self.osVersion forKey:@"osVersion"];
+    [event setObject:self.releaseStage forKey:@"releaseStage"];
+    [event setObject:self.context forKey:@"context"];
     
-    NSMutableDictionary *cause = [[NSMutableDictionary alloc] init];
-    [error setObject:[[NSArray alloc] initWithObjects:cause, nil] forKey:@"causes"];
+    NSMutableDictionary *exception = [[NSMutableDictionary alloc] init];
+    NSArray *exceptions = [[NSArray alloc] initWithObjects:exception, nil];
+    [exception release];
+    [event setObject:exceptions forKey:@"exceptions"];
+    [exceptions release];
     
-    [cause setObject:name forKey:@"errorClass"];
-    [cause setObject:message forKey:@"message"];
+    [exception setObject:errorClass forKey:@"errorClass"];
+    [exception setObject:errorMessage forKey:@"message"];
     
     NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
                                                                                      options:NSRegularExpressionCaseInsensitive 
                                                                                        error:nil];
-
+    
     NSMutableArray *stacktrace = [[NSMutableArray alloc] initWithCapacity:[rawStacktrace count]];
     for (NSString *stackLine in rawStacktrace) {
         NSMutableDictionary *lineDetails = [[NSMutableDictionary alloc] initWithCapacity:3];
@@ -230,9 +387,7 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
         if (firstMatch) {
             NSString *packageName = [[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
-                [lineDetails setObject:@"true" forKey:@"inProject"];
-            } else {
-                [lineDetails setObject:@"false" forKey:@"inProject"];
+                [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
             }
             [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:3]] forKey:@"method"];
             [lineDetails setObject:packageName forKey:@"file"];
@@ -246,170 +401,79 @@ void saveError(NSString *name, NSString *message, NSArray *rawStacktrace) {
         [stacktrace addObject:lineDetails];
         [lineDetails release];
     }
-    [cause setObject:stacktrace forKey:@"stacktrace"];
+    [exception setObject:stacktrace forKey:@"stacktrace"];
     [stacktrace release];
-    [cause release];
+    
+    NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
+    [event setObject:metadata forKey:@"metaData"];
+    [metadata release];
+    
+    #ifdef _ARM_ARCH_7
+        NSString *arch = @"armv7";
+    #else
+        #ifdef _ARM_ARCH_6
+            NSString *arch = @"armv6";
+        #else
+            #ifdef __i386__
+                NSString *arch = @"i386";  
+            #endif
+        #endif
+    #endif
+    
+    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.platform, @"Device",
+                                                                   arch, @"Architecture",
+                                                                   self.osVersion, @"OS Version",nil] forKey:@"Device"];
+    
+    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.getVisibleViewController, @"Top View Comtroller",
+                                                                   self.appVersion, @"App Version",
+                                                                   [[NSBundle mainBundle] bundleIdentifier], @"Bundle Identifier",nil] forKey:@"Application"];
+    
+    // We need to add meta data to the event, as well as extra data and filter the extra data
+    for(NSString *key in self.extraData) {
+        if([self.dataFilters containsObject:key]) {
+            [self.extraData setValue:@"[FILTERED]" forKey:key];
+        }
+    }
     
     //Ensure the bugsnag dir is there
-    [[NSFileManager  defaultManager] createDirectoryAtPath:generateBugsnagReportPath() withIntermediateDirectories:YES attributes:nil error:nil];
+    [[NSFileManager defaultManager] createDirectoryAtPath:sharedBugsnagNotifier.errorPath withIntermediateDirectories:YES attributes:nil error:nil];
     
-    [error writeToFile:sharedBugsnagNotifier.filename atomically:NO];
-    [error release];
+    [event writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES];
+    [event release];
 }
 
-@implementation Bugsnag
-
-@synthesize bugsnagPayload = _bugsnagPayload;
-@synthesize applicationData = _applicationData;
-@synthesize metaData = _metaData;
-@synthesize filename = _filename;
-@synthesize userId = _userId;
-@synthesize data = _data;
-
-#pragma mark - Static Methods
-
-// The start function. Entry point that should be called early on in application load
-+ (void) startBugsnagWithApiKey:(NSString*)apiKey andReleaseStage:(NSString*)releaseStage {
-    if (!sharedBugsnagNotifier) {
-		if (![apiKey length]) {
-            [NSException raise:@"BugsnagException" format:@"apiKey cannot be empty."];
-		}
-        
-        NSString *stage = releaseStage;
-        if (!stage) {
-#ifdef DEBUG
-            stage = @"Development";
-#else
-            stage = @"Release";
-#endif
-        }
-        sharedBugsnagNotifier = [[Bugsnag alloc] initWithAPIKey:apiKey andReleaseStage:stage];
-		
-        if (!sharedBugsnagNotifier) {
-            [NSException raise:@"BugsnagException" format:@"Unable to alloc the notifier."];
-        }
-        
-        [sharedBugsnagNotifier sendReports];
-        
-        NSSetUncaughtExceptionHandler(&handle_exception);
-        
-        for (NSUInteger i = 0; i < signals_count; i++) {
-            int signalType = signals[i];
-            if (signal(signalType, handle_signal) != 0) {
-                NSLog(@"Unable to register signal handler for %s", strsignal(signalType));
-            }
-        }
-	}
-}
-
-// Allows the user to override the version number information
-+ (void) setAppVersion:(NSString *)appVersion {
-    if (sharedBugsnagNotifier) {
-        [sharedBugsnagNotifier.applicationData setObject:[NSString stringWithString:appVersion] forKey:@"appVersion"];
-    } else {
-        [NSException raise:@"BugsnagException" format:@"Unable to set AppVersion before start called."];
-    }
-}
-
-// Allows the user to set a user Id rather than using the UDID.
-+ (void) setUserId:(NSString *)userId {
-    if (sharedBugsnagNotifier) {
-        sharedBugsnagNotifier.userId = [NSString stringWithString:userId];
-    } else {
-        [NSException raise:@"BugsnagException" format:@"Unable to change UserID before start called."];
-    }
-}
-
-#pragma mark - Instance Methods
-// Internal init function. Sets up the class nicely
-- (id) initWithAPIKey:(NSString*)apiKey andReleaseStage:(NSString*)releaseStage {
-    if ((self = [super init])) {
-        NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: @"iOS Bugsnag Notifier", BUGSNAG_IOS_VERSION, BUGSNAG_IOS_HOMEPAGE, nil] 
-                                                               forKeys:[NSArray arrayWithObjects: @"name", @"version", @"url", nil]];
-        
-        self.bugsnagPayload = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: notifier, [NSString stringWithString:apiKey], [[NSMutableArray alloc] init], nil] 
-                                                            forKeys:[NSArray arrayWithObjects: @"notifier", @"apiKey", @"errors", nil]];
-        
-        self.applicationData = [[NSMutableDictionary alloc] init];
-        self.metaData = [[NSMutableDictionary alloc] init];
-        
-        [self.applicationData setObject:getAppVersion() forKey:@"appVersion"];
-        [self.applicationData setObject:releaseStage forKey:@"releaseStage"];
-        [self.applicationData setObject:getOSVersion() forKey:@"osVersion"];
-        [self.applicationData setObject:getPlatform() forKey:@"device"];
-        
-        self.userId = [[UIDevice currentDevice]uniqueIdentifier];
-        self.filename = generateBugsnagReportFilename();
-        
-        [self registerNotifications];
-    }
-    return self;
-}
-
-// Register for application level notifications
-- (void)registerNotifications {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-}
-
-// Unregister for application level notifications
-- (void)unregisterNotifications {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
-}
-
-// When the application comes from the background check to see if we can send any cached reports
-- (void)applicationDidBecomeActive:(NSNotification *)notif {
-    [self sendReports];
-}
-
-// Append data received
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self.data appendData:data];
-}
-
-// Check the response code received
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    int statusCode = [((NSHTTPURLResponse *)response) statusCode];
-    if (statusCode != 200) {
-        [connection cancel];
-        NSLog(@"Bad response from bugnsag received: %d.", statusCode);
-        self.data = nil;
-    }
-}
-
-// Connection finished successfully
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [self unregisterNotifications];
-    deleteCachedReports();
-}
-
-// No net connection
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    self.data = nil;
-}
-
-// Send any cached reports - will check a send isn't already underway
-- (void)sendReports {
+- (void) sendCachedReports {
     @synchronized(self) {
         if (!self.data) {
-            NSString *payload = getBugsnagPayload();
-            if ( payload ) {
-                sharedBugsnagNotifier.data = [NSMutableData data];
+            if ( self.outstandingReports.count > 0 ) {
+                NSDictionary *currentPayload = [self getNotifyPayload];
+                NSMutableArray *events = [currentPayload objectForKey:@"events"];
+                [events removeAllObjects];
                 
-                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:BUGSNAG_ENDPOINT]];
-                
-                [request setHTTPMethod:@"POST"];
-                [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
-                [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
-                [[NSURLConnection alloc] initWithRequest:request delegate:sharedBugsnagNotifier];
-            } else {
-                [self unregisterNotifications];
+                for ( NSString *file in self.outstandingReports ) {
+                    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:file];
+                    if (dict) {
+                        [events addObject:dict];
+                    }
+                }
+                NSString *payload = [currentPayload JSONRepresentation];
+                if ( payload ) {
+                    self.data = [NSMutableData data];
+                    
+                    NSMutableURLRequest *request = nil;
+                    if(self.enableSSL) {
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
+                    } else {
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
+                    }
+                    
+                    [request setHTTPMethod:@"POST"];
+                    [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
+                    [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
+                    [[[NSURLConnection alloc] initWithRequest:request delegate:self] release];
+                }
             }
         }
     }
-}
-
-// Called on dealloc - will never be called due to private singleton pattern
-- (void)dealloc {
-    [super dealloc];
 }
 @end

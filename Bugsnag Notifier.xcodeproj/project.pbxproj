@@ -210,6 +210,9 @@
 /* Begin PBXProject section */
 		93F1E91B142C5662005A297C /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
 			buildConfigurationList = 93F1E91E142C5662005A297C /* Build configuration list for PBXProject "Bugsnag Notifier" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -348,6 +351,7 @@
 				DEPLOYMENT_POSTPROCESSING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "Bugsnag Notifier";
@@ -363,6 +367,7 @@
 				DEPLOYMENT_POSTPROCESSING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = "Bugsnag Notifier";
