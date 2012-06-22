@@ -420,9 +420,29 @@ void handle_exception(NSException *exception) {
         #endif
     #endif
     
+    vm_size_t pageSize;
+    mach_port_t hostPort = mach_host_self();
+    mach_msg_type_number_t hostSize = sizeof(vm_statistics_data_t) / sizeof(integer_t);
+    host_page_size(hostPort, &pageSize);        
+    
+    vm_statistics_data_t vmStat;
+    natural_t usedMem = 0;
+    natural_t freeMem = 0;
+    natural_t totalMem = 0;
+    if (host_statistics(hostPort, HOST_VM_INFO, (host_info_t)&vmStat, &hostSize) != KERN_SUCCESS) {
+        usedMem = (vmStat.active_count +
+                   vmStat.inactive_count +
+                   vmStat.wire_count) * pageSize;
+        freeMem = vmStat.free_count * pageSize;
+        totalMem = usedMem + freeMem;
+    }
+    
     [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.platform, @"Device",
                                                                    arch, @"Architecture",
-                                                                   self.osVersion, @"OS Version",nil] forKey:@"Device"];
+                                                                   self.osVersion, @"OS Version",
+                                                                   freeMem, @"Free Memory (bytes)",
+                                                                   usedMem, @"Used Memory (bytes)",
+                                                                   totalMem, @"Total Memory (bytes)",nil] forKey:@"Device"];
     
     [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.getVisibleViewController, @"Top View Comtroller",
                                                                    self.appVersion, @"App Version",
