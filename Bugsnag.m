@@ -455,6 +455,8 @@ void handle_exception(NSException *exception) {
         }
     }
     
+    [metadata setValuesForKeysWithDictionary:self.extraData];
+    
     //Ensure the bugsnag dir is there
     [[NSFileManager defaultManager] createDirectoryAtPath:sharedBugsnagNotifier.errorPath withIntermediateDirectories:YES attributes:nil error:nil];
     
