@@ -6,7 +6,6 @@
 #import <Foundation/Foundation.h>
 #import <mach/mach.h>
 
-#import "SBJson.h"
 #import "Bugsnag.h"
 
 @interface Bugsnag ()
@@ -14,6 +13,7 @@
 - (void)sendCachedReports;
 - (void)saveErrorWithClass:(NSString*)errorClass andMessage:(NSString*) errorMessage andStackTrace:(NSArray*) rawStacktrace;
 + (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count;
++ (NSString*) getJSONRepresentation:(NSDictionary*)dict;
 - (UIViewController *)getVisibleViewController;
 - (BOOL) shouldAutoNotify;
 
@@ -478,7 +478,7 @@ void handle_exception(NSException *exception) {
                         [events addObject:dict];
                     }
                 }
-                NSString *payload = [currentPayload JSONRepresentation];
+                NSString *payload = [Bugsnag getJSONRepresentation:currentPayload];
                 if ( payload ) {
                     self.data = [NSMutableData data];
                     
@@ -497,5 +497,58 @@ void handle_exception(NSException *exception) {
             }
         }
     }
+}
+
++ (NSString*) getJSONRepresentation:(NSDictionary*)dict {
+    NSString *returnValue = nil;
+    
+    SEL _JSONKitSelector = NSSelectorFromString(@"JSONString");
+    
+    SEL _SBJsonSelector = NSSelectorFromString(@"JSONRepresentation");
+    
+    SEL _YAJLSelector = NSSelectorFromString(@"yajl_JSONString");
+    
+    id _NXJsonSerializerClass = NSClassFromString(@"NXJsonSerializer");
+    SEL _NXJsonSerializerSelector = NSSelectorFromString(@"serialize:");
+    
+    if (_JSONKitSelector && [dict respondsToSelector:_JSONKitSelector]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:_JSONKitSelector]];
+        invocation.target = dict;
+        invocation.selector = _JSONKitSelector;
+        
+        [invocation invoke];
+        [invocation getReturnValue:&returnValue];
+    } else if (_SBJsonSelector && [dict respondsToSelector:_SBJsonSelector]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:_SBJsonSelector]];
+        invocation.target = dict;
+        invocation.selector = _SBJsonSelector;
+        
+        [invocation invoke];
+        [invocation getReturnValue:&returnValue];
+    } else if (_YAJLSelector && [dict respondsToSelector:_YAJLSelector]) {
+        @try {
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:_YAJLSelector]];
+            invocation.target = dict;
+            invocation.selector = _YAJLSelector;
+            
+            [invocation invoke];
+            [invocation getReturnValue:&returnValue];
+        }
+        @catch (NSException *exception) {
+            return nil;
+        }
+    } else if (_NXJsonSerializerClass && [_NXJsonSerializerClass respondsToSelector:_NXJsonSerializerSelector]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[_NXJsonSerializerClass methodSignatureForSelector:_NXJsonSerializerSelector]];
+        invocation.target = _NXJsonSerializerClass;
+        invocation.selector = _NXJsonSerializerSelector;
+        
+        [invocation setArgument:&dict atIndex:2];
+        
+        [invocation invoke];
+        [invocation getReturnValue:&returnValue];
+    } else {
+        return nil;
+    }
+    return returnValue;
 }
 @end
