@@ -12,7 +12,7 @@
 - (id) initWithAPIKey:(NSString*)apiKey;
 - (void)sendCachedReports;
 - (void)saveErrorWithClass:(NSString*)errorClass andMessage:(NSString*) errorMessage andStackTrace:(NSArray*) rawStacktrace;
-+ (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count;
++ (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count startingAt:(int)start;
 + (NSString*) getJSONRepresentation:(NSDictionary*)dict;
 - (UIViewController *)getVisibleViewController;
 - (BOOL) shouldAutoNotify;
@@ -23,6 +23,29 @@
 @property (readonly) NSString *platform;
 @property (readonly) NSArray *outstandingReports;
 @property (nonatomic, retain) NSMutableData *data;
+@end
+
+@interface NSNumber (FileSizes)
+- (NSString *)fileSize;
+@end
+
+@implementation NSNumber (FileSizes)
+
+- (NSString *)fileSize {
+    float fileSize = [self floatValue];
+    if (fileSize<1023.0f)
+        return([NSString stringWithFormat:@"%i bytes",[self intValue]]);
+    fileSize = fileSize / 1024.0f;
+    if ([self intValue]<1023.0f)
+        return([NSString stringWithFormat:@"%1.1f KB",fileSize]);
+    fileSize = fileSize / 1024.0f;
+    if (fileSize<1023.0f)
+        return([NSString stringWithFormat:@"%1.1f MB",fileSize]);
+    fileSize = fileSize / 1024.0f;
+    
+    return([NSString stringWithFormat:@"%1.1f GB",fileSize]);
+}
+
 @end
 
 static Bugsnag *sharedBugsnagNotifier = nil;
@@ -61,7 +84,7 @@ void handle_signal(int signalReceived) {
 
         [sharedBugsnagNotifier saveErrorWithClass:[NSString stringWithCString:strsignal(signalReceived) encoding:NSUTF8StringEncoding] 
                                        andMessage:@"" 
-                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:count]];
+                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:count startingAt:1]];
     }
     //Propagate the signal back up to take the app down
     raise(signalReceived);
@@ -80,7 +103,7 @@ void handle_exception(NSException *exception) {
         
         [sharedBugsnagNotifier saveErrorWithClass:[exception name] 
                                        andMessage:[exception reason] 
-                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:frameCount]];
+                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:frameCount startingAt:0]];
     }
 }
 
@@ -196,53 +219,69 @@ void handle_exception(NSException *exception) {
 }
 
 - (NSString*) appVersion {
-    if(_appVersion) return [_appVersion copy];
+    if(_appVersion) return [[_appVersion copy] autorelease];
     NSString *bundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 	NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-	if (bundleVersion != nil && versionString != nil) {
+	if (bundleVersion != nil && versionString != nil && ![bundleVersion isEqualToString:versionString]) {
         _appVersion = [NSString stringWithFormat:@"%@ (%@)", versionString, bundleVersion];
     } else if (bundleVersion != nil) {
         _appVersion = bundleVersion;
     } else if(versionString != nil) {
         _appVersion = versionString;
     }
-	return [_appVersion copy];
+	return [[_appVersion copy] autorelease];
 }
 
 - (void) setAppVersion:(NSString*)version {
     if (_appVersion) [_appVersion release];
-    _appVersion = [[version copy] retain];
+    _appVersion = [version copy];
 }
 
 - (NSString*) userId {
-    if(_userId) return [_userId copy];
-    [[NSFileManager defaultManager] createDirectoryAtPath:sharedBugsnagNotifier.errorPath withIntermediateDirectories:YES attributes:nil error:nil];
+    if(_userId) return [[_userId copy] autorelease];
     
-    NSString *userFilename = [[self.errorPath stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]] stringByAppendingPathExtension:@"userId"];
-    _userId = [NSString stringWithContentsOfFile:userFilename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
-    if(_userId) return [_userId copy];
-    
-    CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-    _userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
-    CFRelease(uuid);
-    
-    [_userId writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
-    return [_userId copy];
+    NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    if([folders count]) {
+        NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
+
+        _userId = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+        if(_userId) {
+            return [[_userId copy] autorelease];
+        } else {
+            CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+            _userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+            CFRelease(uuid);
+            
+            [_userId writeToFile:filename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+            return [[_userId copy] autorelease];
+        }
+    } else {
+        _userId = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
+        if(_userId) {
+            return [[_userId copy] autorelease];
+        } else {
+            CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+            _userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+            CFRelease(uuid);
+            [[NSUserDefaults standardUserDefaults] setValue:_userId forKey:@"bugsnag-user-id"];
+            return [[_userId copy] autorelease];
+        }
+    }
 }
 
 - (void) setUserId:(NSString *)userId {
     if(_userId) [_userId release];
-    _userId = [[userId copy] retain];
+    _userId = [userId copy];
 }
 
 - (NSString*) context {
-    if(_context) return [_context copy];
+    if(_context) return [[_context copy] autorelease];
     return NSStringFromClass([[self getVisibleViewController] class]);
 }
 
 - (void) setContext:(NSString *)context {
     if(_context) [_context release];
-    _context = [[_context copy] retain];
+    _context = [_context copy];
 }
 
 - (NSString *) osVersion {
@@ -345,10 +384,10 @@ void handle_exception(NSException *exception) {
     self.data = nil;
 }
 
-+ (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count {
++ (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count startingAt:(int)start {
 	char **strs = backtrace_symbols(frames, count);
 	NSMutableArray *backtrace = [NSMutableArray arrayWithCapacity:count];
-	for (NSInteger i = 0; i < count; i++) {
+	for (NSInteger i = start; i < count; i++) {
 		NSString *entry = [NSString stringWithUTF8String:strs[i]];
 		[backtrace addObject:entry];
 	}
@@ -420,31 +459,30 @@ void handle_exception(NSException *exception) {
         #endif
     #endif
     
-    vm_size_t pageSize;
-    mach_port_t hostPort = mach_host_self();
-    mach_msg_type_number_t hostSize = sizeof(vm_statistics_data_t) / sizeof(integer_t);
-    host_page_size(hostPort, &pageSize);        
-    
-    vm_statistics_data_t vmStat;
     natural_t usedMem = 0;
     natural_t freeMem = 0;
     natural_t totalMem = 0;
-    if (host_statistics(hostPort, HOST_VM_INFO, (host_info_t)&vmStat, &hostSize) != KERN_SUCCESS) {
-        usedMem = (vmStat.active_count +
-                   vmStat.inactive_count +
-                   vmStat.wire_count) * pageSize;
-        freeMem = vmStat.free_count * pageSize;
-        totalMem = usedMem + freeMem;
-    }
+    
+    struct task_basic_info info;
+    mach_msg_type_number_t size = sizeof(info);
+    kern_return_t kerr = task_info(mach_task_self(),
+                                   TASK_BASIC_INFO,
+                                   (task_info_t)&info,
+                                   &size);
+    if( kerr == KERN_SUCCESS ) {
+        usedMem = info.resident_size;
+        totalMem = info.virtual_size;
+        freeMem = totalMem - usedMem;
+    } 
     
     [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.platform, @"Device",
-                                                                   arch, @"Architecture",
-                                                                   self.osVersion, @"OS Version",
-                                                                   freeMem, @"Free Memory (bytes)",
-                                                                   usedMem, @"Used Memory (bytes)",
-                                                                   totalMem, @"Total Memory (bytes)",nil] forKey:@"Device"];
+                         arch, @"Architecture",
+                         self.osVersion, @"OS Version",
+                         [[NSNumber numberWithInt:freeMem] fileSize], @"Free Memory",
+                         [[NSNumber numberWithInt:usedMem] fileSize], @"Used Memory",
+                         [[NSNumber numberWithInt:totalMem] fileSize], @"Total Memory",nil] forKey:@"Device"];
     
-    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.getVisibleViewController, @"Top View Comtroller",
+    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:NSStringFromClass([self.getVisibleViewController class]), @"Top View Comtroller",
                                                                    self.appVersion, @"App Version",
                                                                    [[NSBundle mainBundle] bundleIdentifier], @"Bundle Identifier",nil] forKey:@"Application"];
     
@@ -460,7 +498,9 @@ void handle_exception(NSException *exception) {
     //Ensure the bugsnag dir is there
     [[NSFileManager defaultManager] createDirectoryAtPath:sharedBugsnagNotifier.errorPath withIntermediateDirectories:YES attributes:nil error:nil];
     
-    [event writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES];
+    if(![event writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES]) {
+        BugLog(@"BUGSNAG: Unable to write notice file!");
+    }
     [event release];
 }
 
@@ -478,21 +518,23 @@ void handle_exception(NSException *exception) {
                         [events addObject:dict];
                     }
                 }
-                NSString *payload = [Bugsnag getJSONRepresentation:currentPayload];
-                if ( payload ) {
-                    self.data = [NSMutableData data];
-                    
-                    NSMutableURLRequest *request = nil;
-                    if(self.enableSSL) {
-                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
-                    } else {
-                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
+                if(events && events.count != 0) {
+                    NSString *payload = [Bugsnag getJSONRepresentation:currentPayload];
+                    if ( payload ) {
+                        self.data = [NSMutableData data];
+                        
+                        NSMutableURLRequest *request = nil;
+                        if(self.enableSSL) {
+                            request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
+                        } else {
+                            request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
+                        }
+                        
+                        [request setHTTPMethod:@"POST"];
+                        [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
+                        [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
+                        [[[NSURLConnection alloc] initWithRequest:request delegate:self] release];
                     }
-                    
-                    [request setHTTPMethod:@"POST"];
-                    [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
-                    [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
-                    [[[NSURLConnection alloc] initWithRequest:request delegate:self] release];
                 }
             }
         }
@@ -502,52 +544,63 @@ void handle_exception(NSException *exception) {
 + (NSString*) getJSONRepresentation:(NSDictionary*)dict {
     NSString *returnValue = nil;
     
-    SEL _JSONKitSelector = NSSelectorFromString(@"JSONString");
+    id NSJSONClass = NSClassFromString(@"NSJSONSerialization");
+    SEL NSJSONSel = NSSelectorFromString(@"dataWithJSONObject:options:error:");
     
-    SEL _SBJsonSelector = NSSelectorFromString(@"JSONRepresentation");
+    SEL SBJsonSel = NSSelectorFromString(@"JSONRepresentation");
     
-    SEL _YAJLSelector = NSSelectorFromString(@"yajl_JSONString");
+    SEL JSONKitSel = NSSelectorFromString(@"JSONString");
     
-    id _NXJsonSerializerClass = NSClassFromString(@"NXJsonSerializer");
-    SEL _NXJsonSerializerSelector = NSSelectorFromString(@"serialize:");
+    SEL YAJLSel = NSSelectorFromString(@"yajl_JSONString");
     
-    if (_JSONKitSelector && [dict respondsToSelector:_JSONKitSelector]) {
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:_JSONKitSelector]];
+    id NXJsonClass = NSClassFromString(@"NXJsonSerializer");
+    SEL NXJsonSel = NSSelectorFromString(@"serialize:");
+    
+    if(NSJSONClass && [NSJSONClass respondsToSelector:NSJSONSel]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[NSJSONClass methodSignatureForSelector:NSJSONSel]];
+        invocation.target = NSJSONClass;
+        invocation.selector = NSJSONSel;
+        
+        [invocation setArgument:&dict atIndex:2];
+        NSUInteger writeOptions = 0;
+        [invocation setArgument:&writeOptions atIndex:3];
+        
+        [invocation invoke];
+        
+        NSData *data = nil;
+        [invocation getReturnValue:&data];
+        
+        returnValue = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+    } else if (SBJsonSel && [dict respondsToSelector:SBJsonSel]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:SBJsonSel]];
         invocation.target = dict;
-        invocation.selector = _JSONKitSelector;
+        invocation.selector = SBJsonSel;
         
         [invocation invoke];
         [invocation getReturnValue:&returnValue];
-    } else if (_SBJsonSelector && [dict respondsToSelector:_SBJsonSelector]) {
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:_SBJsonSelector]];
+    } else if (JSONKitSel && [dict respondsToSelector:JSONKitSel]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:JSONKitSel]];
         invocation.target = dict;
-        invocation.selector = _SBJsonSelector;
+        invocation.selector = JSONKitSel;
         
         [invocation invoke];
         [invocation getReturnValue:&returnValue];
-    } else if (_YAJLSelector && [dict respondsToSelector:_YAJLSelector]) {
-        @try {
-            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:_YAJLSelector]];
-            invocation.target = dict;
-            invocation.selector = _YAJLSelector;
-            
-            [invocation invoke];
-            [invocation getReturnValue:&returnValue];
-        }
-        @catch (NSException *exception) {
-            return nil;
-        }
-    } else if (_NXJsonSerializerClass && [_NXJsonSerializerClass respondsToSelector:_NXJsonSerializerSelector]) {
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[_NXJsonSerializerClass methodSignatureForSelector:_NXJsonSerializerSelector]];
-        invocation.target = _NXJsonSerializerClass;
-        invocation.selector = _NXJsonSerializerSelector;
+    } else if (YAJLSel && [dict respondsToSelector:YAJLSel]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[dict methodSignatureForSelector:YAJLSel]];
+        invocation.target = dict;
+        invocation.selector = YAJLSel;
+        
+        [invocation invoke];
+        [invocation getReturnValue:&returnValue];
+    } else if (NXJsonClass && [NXJsonClass respondsToSelector:NXJsonSel]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[NXJsonClass methodSignatureForSelector:NXJsonSel]];
+        invocation.target = NXJsonClass;
+        invocation.selector = NXJsonSel;
         
         [invocation setArgument:&dict atIndex:2];
         
         [invocation invoke];
         [invocation getReturnValue:&returnValue];
-    } else {
-        return nil;
     }
     return returnValue;
 }

@@ -20,6 +20,7 @@
 {
     // Override point for customization after application launch.
     [Bugsnag startBugsnagWithApiKey:@""];
+    [[Bugsnag instance].notifyReleaseStages = [[NSArray alloc] initWithObjects:@"development", @"production", nil] release];
      
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
