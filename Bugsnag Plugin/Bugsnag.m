@@ -26,7 +26,6 @@
 - (void) writeEventToDisk:(NSDictionary*)event;
 - (void) backgroundNotifyAndSend:(NSArray*)arguments;
 - (void) backgroundSendCachedReports;
-- (void) backgroundDeleteSentFiles;
 
 @property (readonly) NSString *errorPath;
 @property (readonly) NSString *errorFilename;
@@ -246,27 +245,6 @@ void handle_exception(NSException *exception) {
     
     if(![event writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES]) {
         BugLog(@"BUGSNAG: Unable to write notice file!");
-    }
-}
-
-- (void) transmitPayloadToBugnsag:(NSDictionary *)passedPayload {
-    if([[passedPayload objectForKey:@"events"] count]) {
-        NSString *payload = [Bugsnag getJSONRepresentation:passedPayload];
-        if(payload){
-            self.data = [NSMutableData data];
-            
-            NSMutableURLRequest *request = nil;
-            if(self.enableSSL) {
-                request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
-            } else {
-                request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
-            }
-            
-            [request setHTTPMethod:@"POST"];
-            [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
-            [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
-            [[[NSURLConnection alloc] initWithRequest:request delegate:self] release];
-        }
     }
 }
                            
@@ -546,7 +524,7 @@ void handle_exception(NSException *exception) {
 
 - (NSArray *) outstandingReports {
 	NSArray *directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.errorPath error:nil];
-	NSMutableArray *outstandingReports = [[NSMutableArray arrayWithCapacity:[directoryContents count]] retain];
+	NSMutableArray *outstandingReports = [NSMutableArray arrayWithCapacity:[directoryContents count]];
 	for (NSString *file in directoryContents) {
 		if ([[file pathExtension] isEqualToString:@"bugsnag"]) {
 			NSString *crashPath = [self.errorPath stringByAppendingPathComponent:file];
@@ -568,35 +546,7 @@ void handle_exception(NSException *exception) {
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notif {
-    [self sendCachedReports];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)passedData {
-    [self.data appendData:passedData];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    int statusCode = [((NSHTTPURLResponse *)response) statusCode];
-    if (statusCode != 200) {
-        BugLog(@"Bad response from bugnsag received: %d.", statusCode);
-    }
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [self performSelectorInBackground:@selector(backgroundDeleteSentFiles) withObject:nil];
-    self.data = nil;
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    self.data = nil;
-}
-
-- (void) backgroundDeleteSentFiles {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    for(NSString *file in self.sentFilenames) {
-        [[NSFileManager defaultManager] removeItemAtPath:file error:nil];
-    }
-    [pool release];
+    [sharedBugsnagNotifier performSelectorInBackground:@selector(backgroundSendCachedReports) withObject:nil];
 }
 
 + (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count startingAt:(int)start {
@@ -618,22 +568,47 @@ void handle_exception(NSException *exception) {
 
 - (void) sendCachedReports {
     @synchronized(self) {
-        if (!self.data) {
-            NSArray *outstandingReports = self.outstandingReports;
-            if ( outstandingReports.count > 0 ) {
-                NSDictionary *currentPayload = [self getNotifyPayload];
-                NSMutableArray *events = [currentPayload objectForKey:@"events"];
-                [events removeAllObjects];
-                self.sentFilenames = [NSMutableArray array];
-                
-                for ( NSString *file in outstandingReports ) {
-                    [self.sentFilenames addObject:file];
-                    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:file];
-                    if (dict) {
-                        [events addObject:dict];
+        NSArray *outstandingReports = self.outstandingReports;
+        if ( outstandingReports.count > 0 ) {
+            NSDictionary *currentPayload = [self getNotifyPayload];
+            NSMutableArray *events = [currentPayload objectForKey:@"events"];
+            [events removeAllObjects];
+            self.sentFilenames = [NSMutableArray array];
+            
+            for ( NSString *file in outstandingReports ) {
+                [self.sentFilenames addObject:file];
+                NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:file];
+                if (dict) {
+                    [events addObject:dict];
+                }
+            }
+            
+            if([events count]) {
+                NSString *payload = [Bugsnag getJSONRepresentation:currentPayload];
+                if(payload){
+                    NSMutableURLRequest *request = nil;
+                    if(self.enableSSL) {
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
+                    } else {
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
+                    }
+                    
+                    [request setHTTPMethod:@"POST"];
+                    [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
+                    [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
+                    
+                    NSURLResponse* response = nil;
+                    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+                    
+                    int statusCode = [((NSHTTPURLResponse *)response) statusCode];
+                    if (statusCode != 200) {
+                        BugLog(@"Bad response from bugnsag received: %d.", statusCode);
+                    }
+                    
+                    for(NSString *file in self.sentFilenames) {
+                        [[NSFileManager defaultManager] removeItemAtPath:file error:nil];
                     }
                 }
-                [sharedBugsnagNotifier transmitPayloadToBugnsag:currentPayload];
             }
         }
     }
