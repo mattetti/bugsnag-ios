@@ -6,11 +6,12 @@
     NSString *_userId;
     NSString *_errorPath;
     NSString *_context;
-    NSMutableArray *_outstandingReports;
 }
 
 + (void) startBugsnagWithApiKey:(NSString*)apiKey;
 + (Bugsnag *)instance;
++ (void) notify:(NSException *)exception;
++ (void) notify:(NSException *)exception withData:(NSDictionary*)extraData;
 
 @property (nonatomic, copy) NSString *userId;
 @property (nonatomic, copy) NSString *appVersion;

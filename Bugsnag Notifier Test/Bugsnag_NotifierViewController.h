@@ -12,5 +12,6 @@
 
 -(IBAction) generateException:(UIButton*)sender;
 -(IBAction) generateSignal:(UIButton*)sender;
+-(IBAction) generateNonFatalException:(UIButton*)sender;
 
 @end

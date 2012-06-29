@@ -8,14 +8,25 @@
 
 #import "Bugsnag.h"
 
+#ifdef DEBUG
+#   define BugLog(__FORMAT__, ...) NSLog(__FORMAT__, ##__VA_ARGS__)
+#else
+#   define BugLog(...) do {} while (0)
+#endif
+
 @interface Bugsnag ()
 - (id) initWithAPIKey:(NSString*)apiKey;
 - (void)sendCachedReports;
-- (void)saveErrorWithClass:(NSString*)errorClass andMessage:(NSString*) errorMessage andStackTrace:(NSArray*) rawStacktrace;
 + (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count startingAt:(int)start;
 + (NSString*) getJSONRepresentation:(NSDictionary*)dict;
 - (UIViewController *)getVisibleViewController;
+- (NSDictionary *) generateEventFromException:(NSException*)exception withExtraData:(NSDictionary*)passedExtraData;
 - (BOOL) shouldAutoNotify;
+- (NSDictionary*) generateEventFromErrorClass:(NSString*)errorClass errorMessage:(NSString*)errorMessage stackTrace:(NSArray*)rawStacktrace extraData:(NSDictionary*)passedExtraData;
+- (void) writeEventToDisk:(NSDictionary*)event;
+- (void) backgroundNotifyAndSend:(NSArray*)arguments;
+- (void) backgroundSendCachedReports;
+- (void) backgroundDeleteSentFiles;
 
 @property (readonly) NSString *errorPath;
 @property (readonly) NSString *errorFilename;
@@ -23,6 +34,7 @@
 @property (readonly) NSString *platform;
 @property (readonly) NSArray *outstandingReports;
 @property (nonatomic, retain) NSMutableData *data;
+@property (nonatomic, retain) NSMutableArray *sentFilenames;
 @end
 
 @interface NSNumber (FileSizes)
@@ -81,10 +93,13 @@ void handle_signal(int signalReceived) {
         int count = 128;
 		void *frames[count];
 		count = backtrace(frames, count);
-
-        [sharedBugsnagNotifier saveErrorWithClass:[NSString stringWithCString:strsignal(signalReceived) encoding:NSUTF8StringEncoding] 
-                                       andMessage:@"" 
-                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:count startingAt:1]];
+        
+        NSDictionary *event = [sharedBugsnagNotifier generateEventFromErrorClass:[NSString stringWithCString:strsignal(signalReceived) encoding:NSUTF8StringEncoding]
+                                                                    errorMessage:@"" 
+                                                                      stackTrace:[Bugsnag getCallStackFromFrames:frames andCount:count startingAt:1] 
+                                                                       extraData:sharedBugsnagNotifier.extraData];
+        
+        [sharedBugsnagNotifier writeEventToDisk:event];
     }
     //Propagate the signal back up to take the app down
     raise(signalReceived);
@@ -95,15 +110,9 @@ void handle_exception(NSException *exception) {
     if (sharedBugsnagNotifier && [sharedBugsnagNotifier shouldAutoNotify]) {
         remove_handlers();
         
-        NSUInteger frameCount = [[exception callStackReturnAddresses] count];
-        void *frames[frameCount];
-        for (NSInteger i = 0; i < frameCount; i++) {
-            frames[i] = (void *)[[[exception callStackReturnAddresses] objectAtIndex:i] unsignedIntegerValue];
-        }
+        NSDictionary *event = [sharedBugsnagNotifier generateEventFromException:exception withExtraData:sharedBugsnagNotifier.extraData];
         
-        [sharedBugsnagNotifier saveErrorWithClass:[exception name] 
-                                       andMessage:[exception reason] 
-                                    andStackTrace:[Bugsnag getCallStackFromFrames:frames andCount:frameCount startingAt:0]];
+        [sharedBugsnagNotifier writeEventToDisk:event];
     }
 }
 
@@ -117,12 +126,7 @@ void handle_exception(NSException *exception) {
 @synthesize extraData;
 @synthesize dataFilters;
 @synthesize notifyReleaseStages;
-
-#ifdef DEBUG
-#   define BugLog(__FORMAT__, ...) NSLog(__FORMAT__, ##__VA_ARGS__)
-#else
-#   define BugLog(...) do {} while (0)
-#endif
+@synthesize sentFilenames;
 
 #define BUGSNAG_IOS_VERSION @"1.0.0"
 #define BUGSNAG_IOS_HOMEPAGE @"https://github.com/bugsnag/bugsnag-ios"
@@ -151,12 +155,38 @@ void handle_exception(NSException *exception) {
             }
         }
         
-        [sharedBugsnagNotifier sendCachedReports];
+        [sharedBugsnagNotifier performSelectorInBackground:@selector(backgroundSendCachedReports) withObject:nil];
 	}
 }
 
 + (Bugsnag *)instance {
     return sharedBugsnagNotifier;
+}
+
++ (void) notify:(NSException *)exception {
+    [self notify:exception withData:nil];
+}
+
++ (void) notify:(NSException *)exception withData:(NSDictionary*)extraData {
+    if(sharedBugsnagNotifier && exception) {
+        if(![[exception callStackReturnAddresses] count]) {
+            @try {
+                [exception raise];
+            }
+            @catch (NSException *exception) {
+                exception = exception;
+            }
+        }
+        
+        NSArray *arguments = nil;
+        if(extraData) {
+            arguments = [NSArray arrayWithObjects:exception, extraData, nil];
+        } else {
+            arguments = [NSArray arrayWithObjects:exception, nil];
+        }
+        
+        [sharedBugsnagNotifier performSelectorInBackground:@selector(backgroundNotifyAndSend:) withObject:arguments];
+    }
 }
 
 #pragma mark - Instance Methods
@@ -166,11 +196,10 @@ void handle_exception(NSException *exception) {
         _appVersion = nil;
         _errorPath = nil;
         _userId = nil;
-        _outstandingReports = nil;
         self.enableSSL = NO;
         self.autoNotify = YES;
-        [self.notifyReleaseStages = [[NSArray alloc] initWithObjects:@"production", nil] release];
-        [self.dataFilters = [[NSArray alloc] initWithObjects:@"password", nil] release];
+        self.notifyReleaseStages = [NSArray arrayWithObject:@"production"];
+        self.dataFilters = [NSArray arrayWithObject:@"password"];
         
 #ifdef DEBUG
         self.releaseStage = @"development";
@@ -181,6 +210,184 @@ void handle_exception(NSException *exception) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     }
     return self;
+}
+
+- (void) backgroundNotifyAndSend:(NSArray*)arguments {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    NSException *exception = [arguments objectAtIndex:0];
+    NSDictionary *passedExtraData = nil;
+    if(arguments.count > 1) {
+        passedExtraData = [arguments objectAtIndex:1];
+    }
+    NSDictionary *currentPayload = [sharedBugsnagNotifier getNotifyPayload];
+    NSMutableArray *events = [currentPayload objectForKey:@"events"];
+    [events removeAllObjects];
+    
+    NSDictionary *sentExtraData = nil;
+    if(passedExtraData) {
+        NSMutableDictionary *extraDataDict = [NSMutableDictionary dictionaryWithDictionary:sharedBugsnagNotifier.extraData];
+        [extraDataDict addEntriesFromDictionary:passedExtraData];
+    } else {
+        sentExtraData = sharedBugsnagNotifier.extraData;
+    }
+    NSDictionary *event = [sharedBugsnagNotifier generateEventFromException:exception withExtraData:sentExtraData];
+    [events addObject:event];
+    
+    [self writeEventToDisk:event];
+    [self sendCachedReports];
+    
+    [pool release];
+}
+
+- (void) writeEventToDisk:(NSDictionary*)event {
+    //Ensure the bugsnag dir is there
+    [[NSFileManager defaultManager] createDirectoryAtPath:sharedBugsnagNotifier.errorPath withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    if(![event writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES]) {
+        BugLog(@"BUGSNAG: Unable to write notice file!");
+    }
+}
+
+- (void) transmitPayloadToBugnsag:(NSDictionary *)passedPayload {
+    if([[passedPayload objectForKey:@"events"] count]) {
+        NSString *payload = [Bugsnag getJSONRepresentation:passedPayload];
+        if(payload){
+            self.data = [NSMutableData data];
+            
+            NSMutableURLRequest *request = nil;
+            if(self.enableSSL) {
+                request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
+            } else {
+                request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
+            }
+            
+            [request setHTTPMethod:@"POST"];
+            [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
+            [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
+            [[[NSURLConnection alloc] initWithRequest:request delegate:self] release];
+        }
+    }
+}
+                           
+- (NSDictionary *) generateEventFromException:(NSException*)exception withExtraData:(NSDictionary*)passedExtraData {
+    NSUInteger frameCount = [[exception callStackReturnAddresses] count];
+    void *frames[frameCount];
+    for (NSInteger i = 0; i < frameCount; i++) {
+        frames[i] = (void *)[[[exception callStackReturnAddresses] objectAtIndex:i] unsignedIntegerValue];
+    }
+    NSArray *rawStacktrace = [Bugsnag getCallStackFromFrames:frames andCount:frameCount startingAt:0];
+
+    return [self generateEventFromErrorClass:exception.name 
+                                errorMessage:exception.reason 
+                                  stackTrace:rawStacktrace 
+                                   extraData:passedExtraData];
+}
+
+- (NSDictionary*) generateEventFromErrorClass:(NSString*)errorClass
+                                 errorMessage:(NSString*)errorMessage
+                                   stackTrace:(NSArray*)rawStacktrace
+                                    extraData:(NSDictionary*)passedExtraData {
+    NSMutableDictionary *event = [[[NSMutableDictionary alloc] init] autorelease];
+    [event setObject:self.userId forKey:@"userId"];
+    [event setObject:self.appVersion forKey:@"appVersion"];
+    [event setObject:self.osVersion forKey:@"osVersion"];
+    [event setObject:self.releaseStage forKey:@"releaseStage"];
+    [event setObject:self.context forKey:@"context"];
+    
+    NSMutableDictionary *exceptionDetails = [[NSMutableDictionary alloc] init];
+    NSArray *exceptions = [[NSArray alloc] initWithObjects:exceptionDetails, nil];
+    [exceptionDetails release];
+    [event setObject:exceptions forKey:@"exceptions"];
+    [exceptions release];
+    
+    [exceptionDetails setObject:errorClass forKey:@"errorClass"];
+    [exceptionDetails setObject:errorMessage forKey:@"message"];
+    
+    NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
+                                                                                     options:NSRegularExpressionCaseInsensitive 
+                                                                                       error:nil];
+    
+    NSMutableArray *stacktrace = [[NSMutableArray alloc] initWithCapacity:[rawStacktrace count]];
+    for (NSString *stackLine in rawStacktrace) {
+        NSMutableDictionary *lineDetails = [[NSMutableDictionary alloc] initWithCapacity:3];
+        NSRange fullRange = NSMakeRange(0, [stackLine length]);
+        
+        NSTextCheckingResult* firstMatch = [stacktraceRegex firstMatchInString:stackLine options:0 range:fullRange];
+        if (firstMatch) {
+            NSString *packageName = [[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
+                [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
+            }
+            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:3]] forKey:@"method"];
+            [lineDetails setObject:packageName forKey:@"file"];
+            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:2]] forKey:@"lineNumber"];
+        } else {
+            [lineDetails setObject:@"UnknownMethod" forKey:@"method"];
+            [lineDetails setObject:@"UnknownLineNumber" forKey:@"lineNumber"];
+            [lineDetails setObject:@"UnknownFile" forKey:@"file"];
+        }
+        
+        [stacktrace addObject:lineDetails];
+        [lineDetails release];
+    }
+    [exceptionDetails setObject:stacktrace forKey:@"stacktrace"];
+    [stacktrace release];
+    
+    NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
+    [event setObject:metadata forKey:@"metaData"];
+    [metadata release];
+    
+#ifdef _ARM_ARCH_7
+    NSString *arch = @"armv7";
+#else
+#ifdef _ARM_ARCH_6
+    NSString *arch = @"armv6";
+#else
+#ifdef __i386__
+    NSString *arch = @"i386";  
+#endif
+#endif
+#endif
+    
+    natural_t usedMem = 0;
+    natural_t freeMem = 0;
+    natural_t totalMem = 0;
+    
+    struct task_basic_info info;
+    mach_msg_type_number_t size = sizeof(info);
+    kern_return_t kerr = task_info(mach_task_self(),
+                                   TASK_BASIC_INFO,
+                                   (task_info_t)&info,
+                                   &size);
+    if( kerr == KERN_SUCCESS ) {
+        usedMem = info.resident_size;
+        totalMem = info.virtual_size;
+        freeMem = totalMem - usedMem;
+    } 
+    
+    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.platform, @"Device",
+                         arch, @"Architecture",
+                         self.osVersion, @"OS Version",
+                         [[NSNumber numberWithInt:freeMem] fileSize], @"Free Memory",
+                         [[NSNumber numberWithInt:usedMem] fileSize], @"Used Memory",
+                         [[NSNumber numberWithInt:totalMem] fileSize], @"Total Memory",nil] forKey:@"Device"];
+    
+    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:NSStringFromClass([self.getVisibleViewController class]), @"Top View Comtroller",
+                         self.appVersion, @"App Version",
+                         [[NSBundle mainBundle] bundleIdentifier], @"Bundle Identifier",nil] forKey:@"Application"];
+    
+    // We need to add meta data to the event, as well as extra data and filter the extra data
+    for(NSString *key in self.extraData) {
+        if([self.dataFilters containsObject:key]) {
+            [self.extraData setValue:@"[FILTERED]" forKey:key];
+        }
+    }
+    
+    if(passedExtraData) {
+        [metadata setObject:passedExtraData forKey:@"Extra Data"];
+    }
+    return event;
 }
 
 - (BOOL) shouldAutoNotify {
@@ -238,13 +445,15 @@ void handle_exception(NSException *exception) {
 }
 
 - (NSString*) userId {
-    if(_userId) return [[_userId copy] autorelease];
+    if(_userId) {
+     return [[_userId copy] autorelease];   
+    }
     
     NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     if([folders count]) {
         NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
 
-        _userId = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+        self.userId = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
         if(_userId) {
             return [[_userId copy] autorelease];
         } else {
@@ -256,12 +465,12 @@ void handle_exception(NSException *exception) {
             return [[_userId copy] autorelease];
         }
     } else {
-        _userId = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
+        self.userId = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
         if(_userId) {
             return [[_userId copy] autorelease];
         } else {
             CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-            _userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+            [self.userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid) release];
             CFRelease(uuid);
             [[NSUserDefaults standardUserDefaults] setValue:_userId forKey:@"bugsnag-user-id"];
             return [[_userId copy] autorelease];
@@ -336,16 +545,15 @@ void handle_exception(NSException *exception) {
 }
 
 - (NSArray *) outstandingReports {
-    if(_outstandingReports) return _outstandingReports;
 	NSArray *directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.errorPath error:nil];
-	_outstandingReports = [[NSMutableArray arrayWithCapacity:[directoryContents count]] retain];
+	NSMutableArray *outstandingReports = [[NSMutableArray arrayWithCapacity:[directoryContents count]] retain];
 	for (NSString *file in directoryContents) {
 		if ([[file pathExtension] isEqualToString:@"bugsnag"]) {
 			NSString *crashPath = [self.errorPath stringByAppendingPathComponent:file];
-			[_outstandingReports addObject:crashPath];
+			[outstandingReports addObject:crashPath];
 		}
 	}
-	return _outstandingReports;
+	return outstandingReports;
 }
 
 - (NSDictionary*) getNotifyPayload {
@@ -370,18 +578,25 @@ void handle_exception(NSException *exception) {
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     int statusCode = [((NSHTTPURLResponse *)response) statusCode];
     if (statusCode != 200) {
-        [connection cancel];
         BugLog(@"Bad response from bugnsag received: %d.", statusCode);
-        self.data = nil;
     }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [[NSFileManager defaultManager] removeItemAtPath:self.errorPath error:nil];
+    [self performSelectorInBackground:@selector(backgroundDeleteSentFiles) withObject:nil];
+    self.data = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     self.data = nil;
+}
+
+- (void) backgroundDeleteSentFiles {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    for(NSString *file in self.sentFilenames) {
+        [[NSFileManager defaultManager] removeItemAtPath:file error:nil];
+    }
+    [pool release];
 }
 
 + (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count startingAt:(int)start {
@@ -395,147 +610,30 @@ void handle_exception(NSException *exception) {
 	return backtrace;
 }
 
-- (void) saveErrorWithClass:(NSString*)errorClass andMessage:(NSString*) errorMessage andStackTrace:(NSArray*) rawStacktrace {
-    NSMutableDictionary *event = [[NSMutableDictionary alloc] init];
-    
-    [event setObject:self.userId forKey:@"userId"];
-    [event setObject:self.appVersion forKey:@"appVersion"];
-    [event setObject:self.osVersion forKey:@"osVersion"];
-    [event setObject:self.releaseStage forKey:@"releaseStage"];
-    [event setObject:self.context forKey:@"context"];
-    
-    NSMutableDictionary *exception = [[NSMutableDictionary alloc] init];
-    NSArray *exceptions = [[NSArray alloc] initWithObjects:exception, nil];
-    [exception release];
-    [event setObject:exceptions forKey:@"exceptions"];
-    [exceptions release];
-    
-    [exception setObject:errorClass forKey:@"errorClass"];
-    [exception setObject:errorMessage forKey:@"message"];
-    
-    NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
-                                                                                     options:NSRegularExpressionCaseInsensitive 
-                                                                                       error:nil];
-    
-    NSMutableArray *stacktrace = [[NSMutableArray alloc] initWithCapacity:[rawStacktrace count]];
-    for (NSString *stackLine in rawStacktrace) {
-        NSMutableDictionary *lineDetails = [[NSMutableDictionary alloc] initWithCapacity:3];
-        NSRange fullRange = NSMakeRange(0, [stackLine length]);
-        
-        NSTextCheckingResult* firstMatch = [stacktraceRegex firstMatchInString:stackLine options:0 range:fullRange];
-        if (firstMatch) {
-            NSString *packageName = [[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
-                [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
-            }
-            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:3]] forKey:@"method"];
-            [lineDetails setObject:packageName forKey:@"file"];
-            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:2]] forKey:@"lineNumber"];
-        } else {
-            [lineDetails setObject:@"UnknownMethod" forKey:@"method"];
-            [lineDetails setObject:@"UnknownLineNumber" forKey:@"lineNumber"];
-            [lineDetails setObject:@"UnknownFile" forKey:@"file"];
-        }
-        
-        [stacktrace addObject:lineDetails];
-        [lineDetails release];
-    }
-    [exception setObject:stacktrace forKey:@"stacktrace"];
-    [stacktrace release];
-    
-    NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
-    [event setObject:metadata forKey:@"metaData"];
-    [metadata release];
-    
-    #ifdef _ARM_ARCH_7
-        NSString *arch = @"armv7";
-    #else
-        #ifdef _ARM_ARCH_6
-            NSString *arch = @"armv6";
-        #else
-            #ifdef __i386__
-                NSString *arch = @"i386";  
-            #endif
-        #endif
-    #endif
-    
-    natural_t usedMem = 0;
-    natural_t freeMem = 0;
-    natural_t totalMem = 0;
-    
-    struct task_basic_info info;
-    mach_msg_type_number_t size = sizeof(info);
-    kern_return_t kerr = task_info(mach_task_self(),
-                                   TASK_BASIC_INFO,
-                                   (task_info_t)&info,
-                                   &size);
-    if( kerr == KERN_SUCCESS ) {
-        usedMem = info.resident_size;
-        totalMem = info.virtual_size;
-        freeMem = totalMem - usedMem;
-    } 
-    
-    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:self.platform, @"Device",
-                         arch, @"Architecture",
-                         self.osVersion, @"OS Version",
-                         [[NSNumber numberWithInt:freeMem] fileSize], @"Free Memory",
-                         [[NSNumber numberWithInt:usedMem] fileSize], @"Used Memory",
-                         [[NSNumber numberWithInt:totalMem] fileSize], @"Total Memory",nil] forKey:@"Device"];
-    
-    [metadata setObject:[NSDictionary dictionaryWithObjectsAndKeys:NSStringFromClass([self.getVisibleViewController class]), @"Top View Comtroller",
-                                                                   self.appVersion, @"App Version",
-                                                                   [[NSBundle mainBundle] bundleIdentifier], @"Bundle Identifier",nil] forKey:@"Application"];
-    
-    // We need to add meta data to the event, as well as extra data and filter the extra data
-    for(NSString *key in self.extraData) {
-        if([self.dataFilters containsObject:key]) {
-            [self.extraData setValue:@"[FILTERED]" forKey:key];
-        }
-    }
-    
-    [metadata setValuesForKeysWithDictionary:self.extraData];
-    
-    //Ensure the bugsnag dir is there
-    [[NSFileManager defaultManager] createDirectoryAtPath:sharedBugsnagNotifier.errorPath withIntermediateDirectories:YES attributes:nil error:nil];
-    
-    if(![event writeToFile:sharedBugsnagNotifier.errorFilename atomically:YES]) {
-        BugLog(@"BUGSNAG: Unable to write notice file!");
-    }
-    [event release];
+- (void) backgroundSendCachedReports {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [self sendCachedReports];
+    [pool release];
 }
 
 - (void) sendCachedReports {
     @synchronized(self) {
         if (!self.data) {
-            if ( self.outstandingReports.count > 0 ) {
+            NSArray *outstandingReports = self.outstandingReports;
+            if ( outstandingReports.count > 0 ) {
                 NSDictionary *currentPayload = [self getNotifyPayload];
                 NSMutableArray *events = [currentPayload objectForKey:@"events"];
                 [events removeAllObjects];
+                self.sentFilenames = [NSMutableArray array];
                 
-                for ( NSString *file in self.outstandingReports ) {
+                for ( NSString *file in outstandingReports ) {
+                    [self.sentFilenames addObject:file];
                     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:file];
                     if (dict) {
                         [events addObject:dict];
                     }
                 }
-                if(events && events.count != 0) {
-                    NSString *payload = [Bugsnag getJSONRepresentation:currentPayload];
-                    if ( payload ) {
-                        self.data = [NSMutableData data];
-                        
-                        NSMutableURLRequest *request = nil;
-                        if(self.enableSSL) {
-                            request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
-                        } else {
-                            request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
-                        }
-                        
-                        [request setHTTPMethod:@"POST"];
-                        [request setHTTPBody:[payload dataUsingEncoding:NSUTF8StringEncoding]];
-                        [request setValue:@"application/json" forHTTPHeaderField:@"content-type"];
-                        [[[NSURLConnection alloc] initWithRequest:request delegate:self] release];
-                    }
-                }
+                [sharedBugsnagNotifier transmitPayloadToBugnsag:currentPayload];
             }
         }
     }

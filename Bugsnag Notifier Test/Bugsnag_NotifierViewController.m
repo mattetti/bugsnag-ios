@@ -7,6 +7,7 @@
 //
 
 #import "Bugsnag_NotifierViewController.h"
+#import "Bugsnag.h"
 
 @implementation Bugsnag_NotifierViewController
 
@@ -24,6 +25,10 @@
 
 - (IBAction)generateException:(UIButton *)sender {
     [NSException raise:@"BugsnagException" format:@"Test exception."];
+}
+
+-(IBAction) generateNonFatalException:(UIButton*)sender {
+    [Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil]];
 }
 
 #pragma mark - View lifecycle
