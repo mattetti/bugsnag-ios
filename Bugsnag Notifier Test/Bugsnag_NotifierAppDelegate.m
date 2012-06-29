@@ -19,7 +19,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    [Bugsnag startBugsnagWithApiKey:@"129521fd540f6c3543da024570fbaec3"];
+[Bugsnag startBugsnagWithApiKey:@"1cf181fc328219cfa2a4979f9f9e09e8"];
     [Bugsnag instance].notifyReleaseStages = [NSArray arrayWithObjects:@"development", @"production", nil];
      
     self.window.rootViewController = self.viewController;

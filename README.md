@@ -50,6 +50,8 @@ In your application:didFinishLaunchingWithOptions: method, register with bugsnag
 [Bugsnag startBugsnagWithApiKey:@"your-api-key-goes-here"];
 ```
 
+###JSON Library
+
 The Bugsnag iOS notifier requires a JSON library in order to function. It is able to use
 the library included in iOS 5 if running on an iOS 5 device. Otherwise it looks for any of the
 following libraries:
@@ -58,6 +60,9 @@ following libraries:
 - [NextiveJson](https://github.com/nextive/NextiveJson)
 - [SBJson](https://stig.github.com/json-framework/)
 - [YAJL](https://lloyd.github.com/yajl/)
+
+If none of these libraries are present, the iOS notifier will be unable to notify Bugsnag of
+an error.
 
 
 Send Non-Fatal Exceptions to Bugsnag
@@ -191,6 +196,6 @@ License
 -------
 
 The Bugsnag ios notifier is released under the 
-Apache License, Version 2.0. Read the full license here:
+MIT License. Read the full license here:
 
-<http://www.apache.org/licenses/LICENSE-2.0>
+<https://github.com/bugsnag/bugsnag-ios/blob/master/LICENSE>
