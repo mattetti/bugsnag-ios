@@ -5,7 +5,7 @@ The Bugsnag Notifier for iOS is designed to give you
 instant notification of exceptions thrown from your iOS applications. 
 The notifier hooks into `NSSetUncaughtExceptionHandler`, which means any 
 uncaught exceptions will trigger a notification to be sent to your Bugsnag
-project. Bugsnag will also monitor for terminal signals sent to your application,
+project. Bugsnag will also monitor for fatal signals sent to your application,
 for example a Segmentation Fault.
 
 
@@ -41,7 +41,7 @@ Include Bugsnag.h and Bugsnag.m in your Xcode project.
 Import the `Bugsnag.h` file into your application delegate.
 
 ```objective-c
-\#import "Bugsnag.h"
+#import "Bugsnag.h"
 ```
 
 In your application:didFinishLaunchingWithOptions: method, register with bugsnag by calling,
@@ -50,14 +50,9 @@ In your application:didFinishLaunchingWithOptions: method, register with bugsnag
 [Bugsnag startBugsnagWithApiKey:@"your-api-key-goes-here"];
 ```
 
-The Bugsnag iOS notifier also requires a JSON library to be included in order to successfully
-notify Bugsnag of an error. The Bugsnag iOS notifier can make use of any of the following third
-party JSON libraries, and can also use the iOS 5.0 parser provided by Apple if running on an
-iOS 5 device.
-
 The Bugsnag iOS notifier requires a JSON library in order to function. It is able to use
 the library included in iOS 5 if running on an iOS 5 device. Otherwise it looks for any of the
-following libraries,
+following libraries:
 
 - [JSONKit](https://github.com/johnezang/JSONKit)
 - [NextiveJson](https://github.com/nextive/NextiveJson)
@@ -90,14 +85,12 @@ Configuration
 
 Bugsnag uses the concept of "contexts" to help display and group your
 errors. Contexts represent what was happening in your application at the
-time an error occurs. In an iOS app, it is useful to set this to be 
-the top most UIViewController.
-    
-The library will set this for you, but if in a certain case you need
-to override its context, you can do so using this property:
+time an error occurs. The iOS Notifier will set this to be the top most
+UIViewController, but if in a certain case you need
+to override the context, you can do so using this property:
 
 ```objective-c
-[Bugsnag instance].context = @"MyActivity";
+[Bugsnag instance].context = @"MyUIViewController";
 ```
 
 ###userId
@@ -116,15 +109,16 @@ username of your currently logged in user, you can set the `userId` property:
 
 ###releaseStage
 
-If you would like to distinguish between errors that happen in different
-stages of the application release process (development, production, etc)
-you can set the `releaseStage` that is reported to Bugsnag.
+In order to distinguish between errors that occur in different stages of
+the application release process a release stage is sent to Bugsnag when 
+an error occurs. This is automatically configured by the iOS notifier to be
+"production", unless DEBUG is defined during compilation. In this case it
+will be set to "development". If you wish to override this, you can do so
+by setting the releaseStage property manually:
 
 ```objective-c
 [Bugsnag instance].releaseStage = @"development";
 ```
-    
-By default this is set to be "production".
 
 ###notifyReleaseStages
 
@@ -141,7 +135,7 @@ set the `notifyReleaseStages` property:
 
 By default, we will automatically notify Bugsnag of any fatal exceptions
 in your application. If you want to stop this from happening, you can set
-`autoNotify`:
+`autoNotify` to NO:
     
 ```objective-c
 [Bugsnag instance].autoNotify = NO;
@@ -154,7 +148,7 @@ data along with every exception. To do this, you can set the
 `extraData` property:
     
 ```objective-c
-[Bugsnag instance].dataFilters = [NSDictionary dictionaryWithObjectsAndKeys:@"username", @"bob-hoskins", nil];
+[Bugsnag instance].extraData = [NSDictionary dictionaryWithObjectsAndKeys:@"bob-hoskins", @"username", nil];
 ```
 
 ###dataFilters
