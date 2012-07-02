@@ -1,5 +1,5 @@
-Official Bugsnag Notifier for iOS
-=====================================
+Bugsnag Notifier for iOS
+========================
 
 The Bugsnag Notifier for iOS gives you instant notification of exceptions 
 thrown from your iOS applications. 
