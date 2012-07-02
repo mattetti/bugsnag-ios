@@ -1,36 +1,17 @@
 Official Bugsnag Notifier for iOS
 =====================================
 
-The Bugsnag Notifier for iOS is designed to give you
-instant notification of exceptions thrown from your iOS applications. 
+The Bugsnag Notifier for iOS gives you instant notification of exceptions 
+thrown from your iOS applications. 
 The notifier hooks into `NSSetUncaughtExceptionHandler`, which means any 
 uncaught exceptions will trigger a notification to be sent to your Bugsnag
 project. Bugsnag will also monitor for fatal signals sent to your application,
 for example a Segmentation Fault.
 
-
-What is Bugsnag?
-----------------
-
 [Bugsnag](http://bugsnag.com) captures errors in real-time from your web, 
 mobile and desktop applications, helping you to understand and resolve them 
-as fast as possible. [Create a free account](http://bugsnag.com).
-
-
-Features
---------
-
--   Automatic notification of uncaught exceptions
--   Exceptions buffered to disk when no internet connection is available, and 
-    sent later
--   Minimal cpu and memory footprint
--   Send your own [non-fatal exceptions](#send-non-fatal-exceptions-to-bugsnag)
-    to Bugsnag
--   Track which View Controllers were open at the time of the exception
--   Send additional meta-data along with your exceptions using 
-    [`extraData`](#extradata)
--   Filter sensitive data before sending exceptions with
-    [`filters`](#filters)
+as fast as possible. [Create a free account](http://bugsnag.com) to start 
+capturing exceptions from your applications.
 
 
 Installation & Setup
@@ -181,21 +162,15 @@ project here:
 
 Contributing
 ------------
- 
--   Check out the latest master to make sure the feature hasn't been 
-    implemented or the bug hasn't been fixed yet
--   Check out the issue tracker to make sure someone already hasn't requested
-    it and/or contributed it
--   Fork the project
--   Start a feature/bugfix branch
+
+-   [Fork](https://help.github.com/articles/fork-a-repo) the [notifier on github](https://github.com/bugsnag/bugsnag-ios)
 -   Commit and push until you are happy with your contribution
+-   [Make a pull request](https://help.github.com/articles/using-pull-requests)
 -   Thanks!
 
 
 License
 -------
 
-The Bugsnag ios notifier is released under the 
-MIT License. Read the full license here:
-
-<https://github.com/bugsnag/bugsnag-ios/blob/master/LICENSE>
+The Bugsnag Android notifier is free software released under the MIT License. 
+See [LICENSE.txt](https://github.com/bugsnag/bugsnag-ios/blob/master/LICENSE.txt) for details.
