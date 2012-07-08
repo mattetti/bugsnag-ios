@@ -607,9 +607,9 @@ void handle_exception(NSException *exception) {
                 if(payload){
                     NSMutableURLRequest *request = nil;
                     if(self.enableSSL) {
-                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://192.168.1.145:8000"]];
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
                     } else {
-                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://192.168.1.145:8000"]];
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
                     }
                     
                     [request setHTTPMethod:@"POST"];
