@@ -169,6 +169,17 @@ servers. Any keys which contain these strings will be filtered.
 
 By default, `dataFilters` is set to `[NSArray arrayWithObject:@"password"]`
 
+###enableSSL
+
+Enables the use of SSL encryption when sending errors to Bugsnag. Enable this if you require the
+extra security
+
+```objective-c
+[Bugsnag instance].enableSSL = NO;
+```
+
+By default, `enableSSL` is set to `NO`.
+
 
 Reporting Bugs or Feature Requests
 ----------------------------------

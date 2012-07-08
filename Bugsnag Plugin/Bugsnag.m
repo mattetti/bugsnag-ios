@@ -404,71 +404,86 @@ void handle_exception(NSException *exception) {
 }
 
 - (NSString*) appVersion {
-    if(_appVersion) return [[_appVersion copy] autorelease];
-    NSString *bundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-	NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-	if (bundleVersion != nil && versionString != nil && ![bundleVersion isEqualToString:versionString]) {
-        _appVersion = [NSString stringWithFormat:@"%@ (%@)", versionString, bundleVersion];
-    } else if (bundleVersion != nil) {
-        _appVersion = bundleVersion;
-    } else if(versionString != nil) {
-        _appVersion = versionString;
+    @synchronized(self){
+        if(_appVersion) {
+            return [[_appVersion copy] autorelease];
+        } else {
+            NSString *bundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+            NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+            if (bundleVersion != nil && versionString != nil && ![bundleVersion isEqualToString:versionString]) {
+                self.appVersion = [NSString stringWithFormat:@"%@ (%@)", versionString, bundleVersion];
+            } else if (bundleVersion != nil) {
+                self.appVersion = bundleVersion;
+            } else if(versionString != nil) {
+                self.appVersion = versionString;
+            }
+            return [[_appVersion copy] autorelease];
+        }
     }
-	return [[_appVersion copy] autorelease];
 }
 
 - (void) setAppVersion:(NSString*)version {
-    if (_appVersion) [_appVersion release];
-    _appVersion = [version copy];
+    @synchronized(self) {
+        if (_appVersion) [_appVersion release];
+        _appVersion = [version copy];
+    }
 }
 
 - (NSString*) userId {
-    if(_userId) {
-     return [[_userId copy] autorelease];   
-    }
-    
-    NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    if([folders count]) {
-        NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
+    @synchronized(self) {
+        if(_userId) {
+         return [[_userId copy] autorelease];   
+        } else {
+            NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+            if([folders count]) {
+                NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
 
-        self.userId = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
-        if(_userId) {
-            return [[_userId copy] autorelease];
-        } else {
-            CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-            _userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
-            CFRelease(uuid);
-            
-            [_userId writeToFile:filename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
-            return [[_userId copy] autorelease];
-        }
-    } else {
-        self.userId = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
-        if(_userId) {
-            return [[_userId copy] autorelease];
-        } else {
-            CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-            [self.userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid) release];
-            CFRelease(uuid);
-            [[NSUserDefaults standardUserDefaults] setValue:_userId forKey:@"bugsnag-user-id"];
-            return [[_userId copy] autorelease];
+                self.userId = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+                if(_userId) {
+                    return [[_userId copy] autorelease];
+                } else {
+                    CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+                    _userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+                    CFRelease(uuid);
+                    
+                    [_userId writeToFile:filename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+                    return [[_userId copy] autorelease];
+                }
+            } else {
+                self.userId = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
+                if(_userId) {
+                    return [[_userId copy] autorelease];
+                } else {
+                    CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+                    [self.userId = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid) release];
+                    CFRelease(uuid);
+                    [[NSUserDefaults standardUserDefaults] setValue:_userId forKey:@"bugsnag-user-id"];
+                    return [[_userId copy] autorelease];
+                }
+            }
         }
     }
 }
 
 - (void) setUserId:(NSString *)userId {
-    if(_userId) [_userId release];
-    _userId = [userId copy];
+    @synchronized(self) {
+        if(_userId) [_userId release];
+        _userId = [userId copy];
+    }
 }
 
 - (NSString*) context {
-    if(_context) return [[_context copy] autorelease];
-    return NSStringFromClass([[self getVisibleViewController] class]);
+    @synchronized(self) {
+        if(_context) return [[_context copy] autorelease];
+        return NSStringFromClass([[self getVisibleViewController] class]);
+    }
 }
 
 - (void) setContext:(NSString *)context {
-    if(_context) [_context release];
-    _context = [_context copy];
+    @synchronized(self) {
+        if(_context) [_context release];
+        _context = [_context copy];
+    }
 }
 
 - (NSString *) osVersion {
@@ -480,15 +495,19 @@ void handle_exception(NSException *exception) {
 }
 
 - (NSString*) errorPath{
-    if(_errorPath) return _errorPath;
-    NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    NSString *filename = [folders count] == 0 ? NSTemporaryDirectory() : [folders objectAtIndex:0];
-    _errorPath = [[filename stringByAppendingPathComponent:@"bugsnag"] retain];
-    return _errorPath;
+    @synchronized(self) {
+        if(_errorPath) return _errorPath;
+        NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+        NSString *filename = [folders count] == 0 ? NSTemporaryDirectory() : [folders objectAtIndex:0];
+        _errorPath = [[filename stringByAppendingPathComponent:@"bugsnag"] retain];
+        return _errorPath;
+    }
 }
 
 - (NSString *) errorFilename {
-    return [[self.errorPath stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]] stringByAppendingPathExtension:@"bugsnag"];
+    @synchronized(self) {
+        return [[self.errorPath stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]] stringByAppendingPathExtension:@"bugsnag"];
+    }
 }
 
 - (UIViewController *)getVisibleViewController {
@@ -588,9 +607,9 @@ void handle_exception(NSException *exception) {
                 if(payload){
                     NSMutableURLRequest *request = nil;
                     if(self.enableSSL) {
-                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://notify.bugsnag.com"]];
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://192.168.1.145:8000"]];
                     } else {
-                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://notify.bugsnag.com"]];
+                        request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://192.168.1.145:8000"]];
                     }
                     
                     [request setHTTPMethod:@"POST"];
