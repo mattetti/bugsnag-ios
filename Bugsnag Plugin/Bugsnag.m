@@ -227,6 +227,7 @@ void handle_exception(NSException *exception) {
     if(passedExtraData) {
         NSMutableDictionary *extraDataDict = [NSMutableDictionary dictionaryWithDictionary:sharedBugsnagNotifier.extraData];
         [extraDataDict addEntriesFromDictionary:passedExtraData];
+        sentExtraData = extraDataDict;
     } else {
         sentExtraData = sharedBugsnagNotifier.extraData;
     }
