@@ -363,7 +363,7 @@ void handle_exception(NSException *exception) {
     }
     
     if(passedExtraData) {
-        [metadata setObject:passedExtraData forKey:@"Extra Data"];
+        [metadata setObject:passedExtraData forKey:@"extra_data"];
     }
     return event;
 }
