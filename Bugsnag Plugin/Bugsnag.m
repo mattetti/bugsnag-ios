@@ -622,7 +622,7 @@ void handle_exception(NSException *exception) {
                     
                     int statusCode = [((NSHTTPURLResponse *)response) statusCode];
                     if (statusCode != 200) {
-                        BugLog(@"Bad response from bugnsag received: %d.", statusCode);
+                        BugLog(@"Bad response from bugsnag received: %d.", statusCode);
                     }
                     
                     for(NSString *file in self.sentFilenames) {
