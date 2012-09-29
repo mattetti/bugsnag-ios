@@ -386,10 +386,13 @@ void handle_exception(NSException *exception) {
     if ([machine isEqualToString:@"iPhone3,1"])    return @"iPhone 4";
     if ([machine isEqualToString:@"iPhone3,3"])    return @"Verizon iPhone 4";
     if ([machine isEqualToString:@"iPhone4,1"])    return @"iPhone 4S";
+    if ([machine isEqualToString:@"iPhone5,1"])    return @"iPhone 5 (GSM)";
+    if ([machine isEqualToString:@"iPhone5,2"])    return @"iPhone S (CDMA)";
     if ([machine isEqualToString:@"iPod1,1"])      return @"iPod Touch 1G";
     if ([machine isEqualToString:@"iPod2,1"])      return @"iPod Touch 2G";
     if ([machine isEqualToString:@"iPod3,1"])      return @"iPod Touch 3G";
     if ([machine isEqualToString:@"iPod4,1"])      return @"iPod Touch 4G";
+    if ([machine isEqualToString:@"iPod5,1"])      return @"iPod 5";
     if ([machine isEqualToString:@"iPad1,1"])      return @"iPad";
     if ([machine isEqualToString:@"iPad2,1"])      return @"iPad 2 (WiFi)";
     if ([machine isEqualToString:@"iPad2,2"])      return @"iPad 2 (GSM)";
