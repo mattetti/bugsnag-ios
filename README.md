@@ -90,7 +90,7 @@ If you would like to override this `userId`, for example to set it to be a
 username of your currently logged in user, you can set the `userId` property:
 
 ```objective-c
-[Bugsnag instance].setUserId = @"leeroy-jenkins";
+[Bugsnag instance].userId = @"leeroy-jenkins";
 ```
 
 ###releaseStage
