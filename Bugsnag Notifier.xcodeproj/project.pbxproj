@@ -29,6 +29,17 @@
 		93F1E95C142C5A07005A297C /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E959142C5A07005A297C /* MainWindow.xib */; };
 		93F1E95F142C5A15005A297C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E95D142C5A15005A297C /* InfoPlist.strings */; };
 		93F1E961142C5A22005A297C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E960142C5A22005A297C /* main.m */; };
+		F483048716717D8800310C2C /* BugsnagNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = F483048616717D8800310C2C /* BugsnagNotifier.m */; };
+		F483048B16717D9400310C2C /* BugsnagEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = F483048A16717D9400310C2C /* BugsnagEvent.m */; };
+		F483048E16717E0600310C2C /* NSNumber+FileSizes.m in Sources */ = {isa = PBXBuildFile; fileRef = F483048D16717E0600310C2C /* NSNumber+FileSizes.m */; };
+		F483049416718D7B00310C2C /* NSDictionary+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049316718D7B00310C2C /* NSDictionary+JSON.m */; };
+		F483049716719C6100310C2C /* UIViewController+Visibility.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049616719C6100310C2C /* UIViewController+Visibility.m */; };
+		F483049A16719C9800310C2C /* UIDevice+Stats.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049916719C9800310C2C /* UIDevice+Stats.m */; };
+		F483049D1671A04700310C2C /* NSMutableDictionary+Merge.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */; };
+		F48304A01671A6FC00310C2C /* BugsnagMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049F1671A6FC00310C2C /* BugsnagMetaData.m */; };
+		F48304A41671EDCB00310C2C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = F48304A31671EDCB00310C2C /* Reachability.m */; };
+		F48304A61671F2B800310C2C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F48304A51671F2B800310C2C /* SystemConfiguration.framework */; };
+		F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */ = {isa = PBXBuildFile; fileRef = F48304A81671FB3E00310C2C /* NSNumber+Duration.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +84,29 @@
 		93F1E960142C5A22005A297C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Bugsnag Notifier Test/main.m"; sourceTree = SOURCE_ROOT; };
 		93F1E962142C5A30005A297C /* Bugsnag Notifier-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Bugsnag Notifier-Info.plist"; path = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist"; sourceTree = SOURCE_ROOT; };
 		93F1E963142C5A30005A297C /* Bugsnag Notifier-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Bugsnag Notifier-Prefix.pch"; path = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		F483048516717D8800310C2C /* BugsnagNotifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagNotifier.h; path = "Bugsnag Plugin/BugsnagNotifier.h"; sourceTree = "<group>"; };
+		F483048616717D8800310C2C /* BugsnagNotifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BugsnagNotifier.m; path = "Bugsnag Plugin/BugsnagNotifier.m"; sourceTree = "<group>"; };
+		F483048916717D9400310C2C /* BugsnagEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagEvent.h; path = "Bugsnag Plugin/BugsnagEvent.h"; sourceTree = "<group>"; };
+		F483048A16717D9400310C2C /* BugsnagEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BugsnagEvent.m; path = "Bugsnag Plugin/BugsnagEvent.m"; sourceTree = "<group>"; };
+		F483048C16717E0600310C2C /* NSNumber+FileSizes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSNumber+FileSizes.h"; path = "Bugsnag Plugin/NSNumber+FileSizes.h"; sourceTree = "<group>"; };
+		F483048D16717E0600310C2C /* NSNumber+FileSizes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNumber+FileSizes.m"; path = "Bugsnag Plugin/NSNumber+FileSizes.m"; sourceTree = "<group>"; };
+		F483048F167184CF00310C2C /* BugsnagLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagLogging.h; path = "Bugsnag Plugin/BugsnagLogging.h"; sourceTree = "<group>"; };
+		F483049216718D7B00310C2C /* NSDictionary+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+JSON.h"; path = "Bugsnag Plugin/NSDictionary+JSON.h"; sourceTree = "<group>"; };
+		F483049316718D7B00310C2C /* NSDictionary+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+JSON.m"; path = "Bugsnag Plugin/NSDictionary+JSON.m"; sourceTree = "<group>"; };
+		F483049516719C6100310C2C /* UIViewController+Visibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIViewController+Visibility.h"; path = "Bugsnag Plugin/UIViewController+Visibility.h"; sourceTree = "<group>"; };
+		F483049616719C6100310C2C /* UIViewController+Visibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+Visibility.m"; path = "Bugsnag Plugin/UIViewController+Visibility.m"; sourceTree = "<group>"; };
+		F483049816719C9800310C2C /* UIDevice+Stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIDevice+Stats.h"; path = "Bugsnag Plugin/UIDevice+Stats.h"; sourceTree = "<group>"; };
+		F483049916719C9800310C2C /* UIDevice+Stats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIDevice+Stats.m"; path = "Bugsnag Plugin/UIDevice+Stats.m"; sourceTree = "<group>"; };
+		F483049B1671A04700310C2C /* NSMutableDictionary+Merge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableDictionary+Merge.h"; path = "Bugsnag Plugin/NSMutableDictionary+Merge.h"; sourceTree = "<group>"; };
+		F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSMutableDictionary+Merge.m"; path = "Bugsnag Plugin/NSMutableDictionary+Merge.m"; sourceTree = "<group>"; };
+		F483049E1671A6FC00310C2C /* BugsnagMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagMetaData.h; path = "Bugsnag Plugin/BugsnagMetaData.h"; sourceTree = "<group>"; };
+		F483049F1671A6FC00310C2C /* BugsnagMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BugsnagMetaData.m; path = "Bugsnag Plugin/BugsnagMetaData.m"; sourceTree = "<group>"; };
+		F48304A11671BA8300310C2C /* BugsnagPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagPrivate.h; path = "Bugsnag Plugin/BugsnagPrivate.h"; sourceTree = "<group>"; };
+		F48304A21671EDCA00310C2C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		F48304A31671EDCB00310C2C /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		F48304A51671F2B800310C2C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		F48304A71671FB3D00310C2C /* NSNumber+Duration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSNumber+Duration.h"; path = "Bugsnag Plugin/NSNumber+Duration.h"; sourceTree = "<group>"; };
+		F48304A81671FB3E00310C2C /* NSNumber+Duration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNumber+Duration.m"; path = "Bugsnag Plugin/NSNumber+Duration.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F48304A61671F2B800310C2C /* SystemConfiguration.framework in Frameworks */,
 				93F1E929142C5662005A297C /* UIKit.framework in Frameworks */,
 				93F1E92B142C5662005A297C /* Foundation.framework in Frameworks */,
 				93F1E92D142C5662005A297C /* CoreGraphics.framework in Frameworks */,
@@ -124,6 +159,7 @@
 		93F1E919142C5662005A297C = {
 			isa = PBXGroup;
 			children = (
+				F48304A51671F2B800310C2C /* SystemConfiguration.framework */,
 				93F1E968142C5A60005A297C /* Bugsnag Notifier */,
 				93F1E92E142C5662005A297C /* Bugsnag Notifier Test */,
 				93F1E927142C5662005A297C /* Frameworks */,
@@ -181,6 +217,28 @@
 			children = (
 				93260F2615998A53000F87AF /* Bugsnag.h */,
 				93260F2715998A53000F87AF /* Bugsnag.m */,
+				F483048916717D9400310C2C /* BugsnagEvent.h */,
+				F483048A16717D9400310C2C /* BugsnagEvent.m */,
+				F483048F167184CF00310C2C /* BugsnagLogging.h */,
+				F483049E1671A6FC00310C2C /* BugsnagMetaData.h */,
+				F483049F1671A6FC00310C2C /* BugsnagMetaData.m */,
+				F483048516717D8800310C2C /* BugsnagNotifier.h */,
+				F483048616717D8800310C2C /* BugsnagNotifier.m */,
+				F48304A11671BA8300310C2C /* BugsnagPrivate.h */,
+				F48304A71671FB3D00310C2C /* NSNumber+Duration.h */,
+				F48304A81671FB3E00310C2C /* NSNumber+Duration.m */,
+				F483049216718D7B00310C2C /* NSDictionary+JSON.h */,
+				F483049316718D7B00310C2C /* NSDictionary+JSON.m */,
+				F483049B1671A04700310C2C /* NSMutableDictionary+Merge.h */,
+				F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */,
+				F483048C16717E0600310C2C /* NSNumber+FileSizes.h */,
+				F483048D16717E0600310C2C /* NSNumber+FileSizes.m */,
+				F48304A21671EDCA00310C2C /* Reachability.h */,
+				F48304A31671EDCB00310C2C /* Reachability.m */,
+				F483049816719C9800310C2C /* UIDevice+Stats.h */,
+				F483049916719C9800310C2C /* UIDevice+Stats.m */,
+				F483049516719C6100310C2C /* UIViewController+Visibility.h */,
+				F483049616719C6100310C2C /* UIViewController+Visibility.m */,
 			);
 			name = "Bugsnag Notifier";
 			sourceTree = "<group>";
@@ -264,6 +322,16 @@
 				93260F9615998AA6000F87AF /* SBJsonTokeniser.m in Sources */,
 				93260F9715998AA6000F87AF /* SBJsonUTF8Stream.m in Sources */,
 				93260F9815998AA6000F87AF /* SBJsonWriter.m in Sources */,
+				F483048716717D8800310C2C /* BugsnagNotifier.m in Sources */,
+				F483048B16717D9400310C2C /* BugsnagEvent.m in Sources */,
+				F483048E16717E0600310C2C /* NSNumber+FileSizes.m in Sources */,
+				F483049416718D7B00310C2C /* NSDictionary+JSON.m in Sources */,
+				F483049716719C6100310C2C /* UIViewController+Visibility.m in Sources */,
+				F483049A16719C9800310C2C /* UIDevice+Stats.m in Sources */,
+				F483049D1671A04700310C2C /* NSMutableDictionary+Merge.m in Sources */,
+				F48304A01671A6FC00310C2C /* BugsnagMetaData.m in Sources */,
+				F48304A41671EDCB00310C2C /* Reachability.m in Sources */,
+				F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

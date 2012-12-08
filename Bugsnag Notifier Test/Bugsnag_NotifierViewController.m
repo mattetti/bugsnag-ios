@@ -27,8 +27,12 @@
     [NSException raise:@"BugsnagException" format:@"Test exception."];
 }
 
--(IBAction) generateNonFatalException:(UIButton*)sender {
+- (IBAction) generateNonFatalException:(UIButton*)sender {
     [Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil]];
+}
+
+- (IBAction) delayedNotify:(UIButton*)sender {
+    [self performSelector:@selector(generateNonFatalException:) withObject:sender afterDelay:5];
 }
 
 #pragma mark - View lifecycle
