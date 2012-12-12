@@ -37,9 +37,9 @@
 		F483049A16719C9800310C2C /* UIDevice+Stats.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049916719C9800310C2C /* UIDevice+Stats.m */; };
 		F483049D1671A04700310C2C /* NSMutableDictionary+Merge.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */; };
 		F48304A01671A6FC00310C2C /* BugsnagMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049F1671A6FC00310C2C /* BugsnagMetaData.m */; };
-		F48304A41671EDCB00310C2C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = F48304A31671EDCB00310C2C /* Reachability.m */; };
 		F48304A61671F2B800310C2C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F48304A51671F2B800310C2C /* SystemConfiguration.framework */; };
 		F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */ = {isa = PBXBuildFile; fileRef = F48304A81671FB3E00310C2C /* NSNumber+Duration.m */; };
+		F4F3A0DC1678237D008CE078 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F3A0DB1678237D008CE078 /* Reachability.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -102,11 +102,11 @@
 		F483049E1671A6FC00310C2C /* BugsnagMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagMetaData.h; path = "Bugsnag Plugin/BugsnagMetaData.h"; sourceTree = "<group>"; };
 		F483049F1671A6FC00310C2C /* BugsnagMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BugsnagMetaData.m; path = "Bugsnag Plugin/BugsnagMetaData.m"; sourceTree = "<group>"; };
 		F48304A11671BA8300310C2C /* BugsnagPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagPrivate.h; path = "Bugsnag Plugin/BugsnagPrivate.h"; sourceTree = "<group>"; };
-		F48304A21671EDCA00310C2C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		F48304A31671EDCB00310C2C /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		F48304A51671F2B800310C2C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		F48304A71671FB3D00310C2C /* NSNumber+Duration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSNumber+Duration.h"; path = "Bugsnag Plugin/NSNumber+Duration.h"; sourceTree = "<group>"; };
 		F48304A81671FB3E00310C2C /* NSNumber+Duration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNumber+Duration.m"; path = "Bugsnag Plugin/NSNumber+Duration.m"; sourceTree = "<group>"; };
+		F4F3A0DA1678237D008CE078 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = "Bugsnag Plugin/Reachability.h"; sourceTree = "<group>"; };
+		F4F3A0DB1678237D008CE078 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = "Bugsnag Plugin/Reachability.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,16 +225,16 @@
 				F483048516717D8800310C2C /* BugsnagNotifier.h */,
 				F483048616717D8800310C2C /* BugsnagNotifier.m */,
 				F48304A11671BA8300310C2C /* BugsnagPrivate.h */,
-				F48304A71671FB3D00310C2C /* NSNumber+Duration.h */,
-				F48304A81671FB3E00310C2C /* NSNumber+Duration.m */,
 				F483049216718D7B00310C2C /* NSDictionary+JSON.h */,
 				F483049316718D7B00310C2C /* NSDictionary+JSON.m */,
 				F483049B1671A04700310C2C /* NSMutableDictionary+Merge.h */,
 				F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */,
+				F48304A71671FB3D00310C2C /* NSNumber+Duration.h */,
+				F48304A81671FB3E00310C2C /* NSNumber+Duration.m */,
 				F483048C16717E0600310C2C /* NSNumber+FileSizes.h */,
 				F483048D16717E0600310C2C /* NSNumber+FileSizes.m */,
-				F48304A21671EDCA00310C2C /* Reachability.h */,
-				F48304A31671EDCB00310C2C /* Reachability.m */,
+				F4F3A0DA1678237D008CE078 /* Reachability.h */,
+				F4F3A0DB1678237D008CE078 /* Reachability.m */,
 				F483049816719C9800310C2C /* UIDevice+Stats.h */,
 				F483049916719C9800310C2C /* UIDevice+Stats.m */,
 				F483049516719C6100310C2C /* UIViewController+Visibility.h */,
@@ -330,8 +330,8 @@
 				F483049A16719C9800310C2C /* UIDevice+Stats.m in Sources */,
 				F483049D1671A04700310C2C /* NSMutableDictionary+Merge.m in Sources */,
 				F48304A01671A6FC00310C2C /* BugsnagMetaData.m in Sources */,
-				F48304A41671EDCB00310C2C /* Reachability.m in Sources */,
 				F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */,
+				F4F3A0DC1678237D008CE078 /* Reachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

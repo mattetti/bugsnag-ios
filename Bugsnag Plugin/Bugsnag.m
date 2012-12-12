@@ -118,14 +118,7 @@ void handle_exception(NSException *exception) {
 
 + (void) notify:(NSException *)exception withData:(NSDictionary*)metaData {
     if(sharedBugsnagNotifier && exception) {
-        if(![[exception callStackReturnAddresses] count]) {
-            @try {
-                [exception raise];
-            }
-            @catch (NSException *exception) {
-                exception = exception;
-            }
-        }
+
         
         NSDictionary *event = [BugsnagEvent generateEventFromException:exception withMetaData:metaData];
         [BugsnagNotifier performSelectorInBackground:@selector(backgroundNotifyAndSend:) withObject:event];

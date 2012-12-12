@@ -35,7 +35,6 @@
                 viewController = viewController.modalViewController;
             }
         }
-        
     }
     
     return visibleViewController;
