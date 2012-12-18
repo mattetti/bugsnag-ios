@@ -84,7 +84,7 @@
                                    stackTrace:(NSArray*)stacktrace
                                      metaData:(NSDictionary*)passedMetaData {
     NSMutableDictionary *event = [[[NSMutableDictionary alloc] init] autorelease];
-    [event setObject:[Bugsnag instance].uuid forKey:@"userId"];
+    [event setObject:[Bugsnag instance].userId forKey:@"userId"];
     [event setObject:[Bugsnag instance].appVersion forKey:@"appVersion"];
     [event setObject:[UIDevice osVersion] forKey:@"osVersion"];
     [event setObject:[Bugsnag instance].releaseStage forKey:@"releaseStage"];

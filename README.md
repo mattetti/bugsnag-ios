@@ -17,7 +17,7 @@ capturing exceptions from your applications.
 Installation & Setup
 --------------------
 
-Include all files in the `Bugsnag Notifier` folder in your Xcode project.
+Include all files in the `Bugsnag Plugin` folder in your Xcode project.
 
 Import the `Bugsnag.h` file into your application delegate.
 
@@ -69,7 +69,7 @@ If you want to add a tab to your Bugsnag error report, you can call the `addToTa
 [Bugsnag addAttribute:@"registered-user" withValue:@"yes" toTabWithName:@"user"];
 ```
 
-This will add a user tab to the error report on bugsnag.com that contains the username and whether the user was registered or not.
+This will add a user tab to any error report sent to bugsnag.com that contains the username and whether the user was registered or not.
 
 You can clear a single attribute on a tab by calling:
 
