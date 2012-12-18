@@ -2,7 +2,7 @@
 #import "BugsnagMetaData.h"
 
 @interface Bugsnag ()
-- (id) initWithAPIKey:(NSString*)apiKey;
+- (id) init;
 - (BOOL) shouldAutoNotify;
 
 @property (retain) BugsnagMetaData *metaData;

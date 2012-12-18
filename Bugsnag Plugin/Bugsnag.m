@@ -82,33 +82,13 @@ void handle_exception(NSException *exception) {
 
 // The start function. Entry point that should be called early on in application load
 + (void) startBugsnagWithApiKey:(NSString*)apiKey {
-    if (!sharedBugsnagNotifier) {
-		if (!apiKey || ![apiKey length]) {
-            BugLog(@"APIKey cannot be empty");
-            return;
-		}
-        
-        sharedBugsnagNotifier = [[Bugsnag alloc] initWithAPIKey:apiKey];
-		
-        if (!sharedBugsnagNotifier) {
-            BugLog(@"Unable to alloc the notifier.");
-            return;
-        }
-        
-        NSSetUncaughtExceptionHandler(&handle_exception);
-        
-        for (NSUInteger i = 0; i < signals_count; i++) {
-            int signalType = signals[i];
-            if (signal(signalType, handle_signal) != 0) {
-                BugLog(@"Unable to register signal handler for %s", strsignal(signalType));
-            }
-        }
-        
-        [BugsnagNotifier performSelectorInBackground:@selector(backgroundSendCachedReports) withObject:nil];
-	}
+    NSLog(@"Starting the Bugsnag iOS Notifier!");
+    [self instance].apiKey = apiKey;
+    [BugsnagNotifier performSelectorInBackground:@selector(backgroundSendCachedReports) withObject:nil];
 }
 
 + (Bugsnag *)instance {
+    if(sharedBugsnagNotifier == nil) sharedBugsnagNotifier = [[Bugsnag alloc] init];
     return sharedBugsnagNotifier;
 }
 
@@ -117,9 +97,7 @@ void handle_exception(NSException *exception) {
 }
 
 + (void) notify:(NSException *)exception withData:(NSDictionary*)metaData {
-    if(sharedBugsnagNotifier && exception) {
-
-        
+    if([self instance] && exception) {
         NSDictionary *event = [BugsnagEvent generateEventFromException:exception withMetaData:metaData];
         [BugsnagNotifier performSelectorInBackground:@selector(backgroundNotifyAndSend:) withObject:event];
     }
@@ -134,17 +112,20 @@ void handle_exception(NSException *exception) {
 }
 
 + (void) addAttribute:(NSString*)attributeName withValue:(id)value toTabWithName:(NSString*)tabName {
-    [[sharedBugsnagNotifier.metaData getTab:tabName] setObject:value forKey:attributeName];
+    if(value) {
+        [[[self instance].metaData getTab:tabName] setObject:value forKey:attributeName];
+    } else {
+        [[[self instance].metaData getTab:tabName] removeObjectForKey:attributeName];
+    }
 }
 
 + (void) clearTabWithName:(NSString*)tabName {
-    [sharedBugsnagNotifier.metaData clearTab:tabName];
+    [[self instance].metaData clearTab:tabName];
 }
 
 #pragma mark - Instance Methods
-- (id) initWithAPIKey:(NSString*)passedApiKey {
+- (id) init {
     if ((self = [super init])) {
-        self.apiKey = passedApiKey;
         _appVersion = nil;
         _userId = nil;
         _uuid = nil;
@@ -154,6 +135,15 @@ void handle_exception(NSException *exception) {
         self.autoNotify = YES;
         self.inForeground = YES;
         self.notifyReleaseStages = [NSArray arrayWithObject:@"production"];
+        
+        NSSetUncaughtExceptionHandler(&handle_exception);
+        
+        for (NSUInteger i = 0; i < signals_count; i++) {
+            int signalType = signals[i];
+            if (signal(signalType, handle_signal) != 0) {
+                BugLog(@"Unable to register signal handler for %s", strsignal(signalType));
+            }
+        }
         
 #ifdef DEBUG
         self.releaseStage = @"development";
@@ -200,7 +190,7 @@ void handle_exception(NSException *exception) {
 - (NSString*) userId {
     @synchronized(self) {
         if(_userId) {
-         return [[_userId copy] autorelease];   
+            return [[_userId copy] autorelease];
         } else {
             return self.uuid;
         }
@@ -224,7 +214,7 @@ void handle_exception(NSException *exception) {
 - (void) setContext:(NSString *)context {
     @synchronized(self) {
         if(_context) [_context release];
-        _context = [_context copy];
+        _context = [context copy];
     }
 }
 

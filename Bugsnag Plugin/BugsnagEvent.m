@@ -60,22 +60,28 @@
 }
 
 + (NSDictionary*) generateEventFromException:(NSException*)exception withMetaData:(NSDictionary*)passedMetaData {
+    if([[exception callStackReturnAddresses] count] == 0) {
+        @try {
+            @throw exception;
+        }
+        @catch (NSException *exception) {}
+    }
     NSUInteger frameCount = [[exception callStackReturnAddresses] count];
     void *frames[frameCount];
     for (NSInteger i = 0; i < frameCount; i++) {
         frames[i] = (void *)[[[exception callStackReturnAddresses] objectAtIndex:i] unsignedIntegerValue];
     }
-    NSArray *rawStacktrace = [BugsnagEvent getCallStackFromFrames:frames andCount:frameCount startingAt:0];
+    NSArray *stacktrace = [BugsnagEvent getCallStackFromFrames:frames andCount:frameCount startingAt:0];
     
     return [self generateEventFromErrorClass:exception.name
                                 errorMessage:exception.reason
-                                  stackTrace:rawStacktrace
+                                  stackTrace:stacktrace
                                     metaData:passedMetaData];
 }
 
 + (NSDictionary*) generateEventFromErrorClass:(NSString*)errorClass
                                  errorMessage:(NSString*)errorMessage
-                                   stackTrace:(NSArray*)rawStacktrace
+                                   stackTrace:(NSArray*)stacktrace
                                      metaData:(NSDictionary*)passedMetaData {
     NSMutableDictionary *event = [[[NSMutableDictionary alloc] init] autorelease];
     [event setObject:[Bugsnag instance].uuid forKey:@"userId"];
@@ -92,36 +98,7 @@
     
     [exceptionDetails setObject:errorClass forKey:@"errorClass"];
     [exceptionDetails setObject:errorMessage forKey:@"message"];
-    
-    NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
-                                                                                     options:NSRegularExpressionCaseInsensitive
-                                                                                       error:nil];
-    
-    NSMutableArray *stacktrace = [[NSMutableArray alloc] initWithCapacity:[rawStacktrace count]];
-    for (NSString *stackLine in rawStacktrace) {
-        NSMutableDictionary *lineDetails = [[NSMutableDictionary alloc] initWithCapacity:3];
-        NSRange fullRange = NSMakeRange(0, [stackLine length]);
-        
-        NSTextCheckingResult* firstMatch = [stacktraceRegex firstMatchInString:stackLine options:0 range:fullRange];
-        if (firstMatch) {
-            NSString *packageName = [[stackLine substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
-                [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
-            }
-            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:3]] forKey:@"method"];
-            [lineDetails setObject:packageName forKey:@"file"];
-            [lineDetails setObject:[stackLine substringWithRange:[firstMatch rangeAtIndex:2]] forKey:@"lineNumber"];
-        } else {
-            [lineDetails setObject:@"UnknownMethod" forKey:@"method"];
-            [lineDetails setObject:@"UnknownLineNumber" forKey:@"lineNumber"];
-            [lineDetails setObject:@"UnknownFile" forKey:@"file"];
-        }
-        
-        [stacktrace addObject:lineDetails];
-        [lineDetails release];
-    }
     [exceptionDetails setObject:stacktrace forKey:@"stacktrace"];
-    [stacktrace release];
     
     BugsnagMetaData *metaData = [[Bugsnag instance].metaData mutableCopy];
     [event setObject:metaData.dictionary forKey:@"metaData"];
@@ -171,12 +148,36 @@
 
 + (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count startingAt:(int)start {
 	char **strs = backtrace_symbols(frames, count);
+    
+    NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
+                                                                                     options:NSRegularExpressionCaseInsensitive
+                                                                                       error:nil];
+    
 	NSMutableArray *backtrace = [NSMutableArray arrayWithCapacity:count];
 	for (NSInteger i = start; i < count; i++) {
 		NSString *entry = [NSString stringWithUTF8String:strs[i]];
-		[backtrace addObject:entry];
+		NSMutableDictionary *lineDetails = [[NSMutableDictionary alloc] initWithCapacity:3];
+        NSRange fullRange = NSMakeRange(0, [entry length]);
+        
+        NSTextCheckingResult* firstMatch = [stacktraceRegex firstMatchInString:entry options:0 range:fullRange];
+        if (firstMatch) {
+            NSString *packageName = [[entry substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
+                [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
+            }
+            [lineDetails setObject:[[entry substringWithRange:[firstMatch rangeAtIndex:3]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:@"method"];
+            [lineDetails setObject:[packageName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:@"file"];
+            [lineDetails setObject:[NSNumber numberWithInt:[[entry substringWithRange:[firstMatch rangeAtIndex:2]] integerValue]] forKey:@"lineNumber"];
+        } else {
+            [lineDetails setObject:@"UnknownMethod" forKey:@"method"];
+            [lineDetails setObject:@"UnknownLineNumber" forKey:@"lineNumber"];
+            [lineDetails setObject:@"UnknownFile" forKey:@"file"];
+        }
+        
+        [backtrace addObject:lineDetails];
+        [lineDetails release];
 	}
 	free(strs);
-	return backtrace;
+    return backtrace;
 }
 @end

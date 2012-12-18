@@ -16,10 +16,18 @@
 #define BUGSNAG_IOS_VERSION @"1.0.0"
 #define BUGSNAG_IOS_HOMEPAGE @"https://github.com/bugsnag/bugsnag-ios"
 
+static NSString *notifierName = @"iOS Bugsnag Notifier";
+static NSString *notifierVersion = BUGSNAG_IOS_VERSION;
+static NSString *notifierURL = BUGSNAG_IOS_HOMEPAGE;
+
 @implementation BugsnagNotifier
 
++ (void) setUnityNotifier {
+    notifierName = @"iOS Unity Notifier";
+}
+
 + (NSDictionary*) getNotifyPayload {
-    NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: @"iOS Bugsnag Notifier", BUGSNAG_IOS_VERSION, BUGSNAG_IOS_HOMEPAGE, nil]
+    NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: notifierName, notifierVersion, notifierURL, nil]
                                                            forKeys:[NSArray arrayWithObjects: @"name", @"version", @"url", nil]];
     NSMutableArray *events = [[NSMutableArray alloc] init];
     NSDictionary *notifierPayload = [[[NSDictionary alloc] initWithObjectsAndKeys:notifier, @"notifier", [Bugsnag instance].apiKey, @"apiKey", events, @"events", nil] autorelease];

@@ -40,6 +40,7 @@
 		F48304A61671F2B800310C2C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F48304A51671F2B800310C2C /* SystemConfiguration.framework */; };
 		F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */ = {isa = PBXBuildFile; fileRef = F48304A81671FB3E00310C2C /* NSNumber+Duration.m */; };
 		F4F3A0DC1678237D008CE078 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F3A0DB1678237D008CE078 /* Reachability.m */; };
+		F4F3A0F516795718008CE078 /* BugsnagUnity.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4F3A0F416795718008CE078 /* BugsnagUnity.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -107,6 +108,7 @@
 		F48304A81671FB3E00310C2C /* NSNumber+Duration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNumber+Duration.m"; path = "Bugsnag Plugin/NSNumber+Duration.m"; sourceTree = "<group>"; };
 		F4F3A0DA1678237D008CE078 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = "Bugsnag Plugin/Reachability.h"; sourceTree = "<group>"; };
 		F4F3A0DB1678237D008CE078 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = "Bugsnag Plugin/Reachability.m"; sourceTree = "<group>"; };
+		F4F3A0F416795718008CE078 /* BugsnagUnity.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BugsnagUnity.mm; path = Unity/BugsnagUnity.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,7 +161,7 @@
 		93F1E919142C5662005A297C = {
 			isa = PBXGroup;
 			children = (
-				F48304A51671F2B800310C2C /* SystemConfiguration.framework */,
+				F4F3A0F1167956EF008CE078 /* Unity */,
 				93F1E968142C5A60005A297C /* Bugsnag Notifier */,
 				93F1E92E142C5662005A297C /* Bugsnag Notifier Test */,
 				93F1E927142C5662005A297C /* Frameworks */,
@@ -178,6 +180,7 @@
 		93F1E927142C5662005A297C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F48304A51671F2B800310C2C /* SystemConfiguration.framework */,
 				93F1E928142C5662005A297C /* UIKit.framework */,
 				93F1E92A142C5662005A297C /* Foundation.framework */,
 				93F1E92C142C5662005A297C /* CoreGraphics.framework */,
@@ -241,6 +244,14 @@
 				F483049616719C6100310C2C /* UIViewController+Visibility.m */,
 			);
 			name = "Bugsnag Notifier";
+			sourceTree = "<group>";
+		};
+		F4F3A0F1167956EF008CE078 /* Unity */ = {
+			isa = PBXGroup;
+			children = (
+				F4F3A0F416795718008CE078 /* BugsnagUnity.mm */,
+			);
+			name = Unity;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -332,6 +343,7 @@
 				F48304A01671A6FC00310C2C /* BugsnagMetaData.m in Sources */,
 				F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */,
 				F4F3A0DC1678237D008CE078 /* Reachability.m in Sources */,
+				F4F3A0F516795718008CE078 /* BugsnagUnity.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
