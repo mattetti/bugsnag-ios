@@ -17,7 +17,7 @@ capturing exceptions from your applications.
 Installation & Setup
 --------------------
 
-Include all files in the Bugsnag Notifier folder in your Xcode project.
+Include all files in the `Bugsnag Notifier` folder in your Xcode project.
 
 Import the `Bugsnag.h` file into your application delegate.
 
@@ -33,17 +33,14 @@ In your application:didFinishLaunchingWithOptions: method, register with bugsnag
 
 ###JSON Library
 
-The Bugsnag iOS notifier requires a JSON library in order to function. It is able to use
-the library included in iOS 5 if running on an iOS 5 device. Otherwise it looks for any of the
-following libraries:
+The Bugsnag iOS notifier requires a JSON library in order to function. It is able to use the library included in iOS 5 if running on an iOS 5 device. Otherwise it looks for any of the following libraries:
 
 - [JSONKit](https://github.com/johnezang/JSONKit)
 - [NextiveJson](https://github.com/nextive/NextiveJson)
 - [SBJson](https://stig.github.com/json-framework/)
 - [YAJL](https://lloyd.github.com/yajl/)
 
-If none of these libraries are present, the iOS notifier will be unable to notify Bugsnag of
-an error.
+If none of these libraries are present, the iOS notifier will be unable to notify Bugsnag of an error.
 
 
 Send Non-Fatal Exceptions to Bugsnag
@@ -59,8 +56,7 @@ If you would like to send non-fatal exceptions to Bugsnag, you can pass any
 You can also send additional meta-data with your exception:
 
 ```objective-c
-[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil]
-       withData:[NSDictionary dictionaryWithObjectsAndKeys:@"username", @"bob-hoskins", nil]];
+[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil] withData:[NSDictionary dictionaryWithObjectsAndKeys:@"username", @"bob-hoskins", nil]];
 ```
 
 Adding Tabs to Bugsnag Error Reports
