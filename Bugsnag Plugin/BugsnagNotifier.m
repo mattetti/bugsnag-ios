@@ -13,7 +13,7 @@
 #import "NSDictionary+JSON.h"
 #import "BugsnagPrivate.h"
 
-#define BUGSNAG_IOS_VERSION @"1.0.0"
+#define BUGSNAG_IOS_VERSION @"2.0.0"
 #define BUGSNAG_IOS_HOMEPAGE @"https://github.com/bugsnag/bugsnag-ios"
 
 static NSString *notifierName = @"iOS Bugsnag Notifier";

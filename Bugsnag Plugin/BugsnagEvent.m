@@ -162,12 +162,17 @@
         NSTextCheckingResult* firstMatch = [stacktraceRegex firstMatchInString:entry options:0 range:fullRange];
         if (firstMatch) {
             NSString *packageName = [[entry substringWithRange:[firstMatch rangeAtIndex:1]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] ) {
+            
+            NSString *method = [[entry substringWithRange:[firstMatch rangeAtIndex:3]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString *file = [packageName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSNumber *lineNumber = [NSNumber numberWithInt:[[entry substringWithRange:[firstMatch rangeAtIndex:2]] integerValue]];
+            
+            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] && ![method hasPrefix:@"+[Bugsnag "] && ![method hasPrefix:@"+[BugsnagEvent "]) {
                 [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
             }
-            [lineDetails setObject:[[entry substringWithRange:[firstMatch rangeAtIndex:3]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:@"method"];
-            [lineDetails setObject:[packageName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:@"file"];
-            [lineDetails setObject:[NSNumber numberWithInt:[[entry substringWithRange:[firstMatch rangeAtIndex:2]] integerValue]] forKey:@"lineNumber"];
+            [lineDetails setObject:method forKey:@"method"];
+            [lineDetails setObject:file forKey:@"file"];
+            [lineDetails setObject:lineNumber forKey:@"lineNumber"];
         } else {
             [lineDetails setObject:@"UnknownMethod" forKey:@"method"];
             [lineDetails setObject:@"UnknownLineNumber" forKey:@"lineNumber"];
