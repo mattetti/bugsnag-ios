@@ -162,7 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				F4F3A0F1167956EF008CE078 /* Unity */,
-				93F1E968142C5A60005A297C /* Bugsnag Notifier */,
+				93F1E968142C5A60005A297C /* Bugsnag Plugin */,
 				93F1E92E142C5662005A297C /* Bugsnag Notifier Test */,
 				93F1E927142C5662005A297C /* Frameworks */,
 				93F1E925142C5662005A297C /* Products */,
@@ -215,7 +215,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		93F1E968142C5A60005A297C /* Bugsnag Notifier */ = {
+		93F1E968142C5A60005A297C /* Bugsnag Plugin */ = {
 			isa = PBXGroup;
 			children = (
 				93260F2615998A53000F87AF /* Bugsnag.h */,
@@ -243,7 +243,7 @@
 				F483049516719C6100310C2C /* UIViewController+Visibility.h */,
 				F483049616719C6100310C2C /* UIViewController+Visibility.m */,
 			);
-			name = "Bugsnag Notifier";
+			name = "Bugsnag Plugin";
 			sourceTree = "<group>";
 		};
 		F4F3A0F1167956EF008CE078 /* Unity */ = {
