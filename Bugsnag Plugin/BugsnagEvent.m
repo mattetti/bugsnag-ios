@@ -119,11 +119,11 @@
         [reachability stopNotifier];
         
         if(status == NotReachable) {
-            [device setObject:@"None" forKey:@"Network"];
+            [device setObject:@"Not Reachable" forKey:@"Network"];
         } else if (status == ReachableViaWiFi) {
-            [device setObject:@"WiFi" forKey:@"Network"];
+            [device setObject:@"Reachable via WiFi" forKey:@"Network"];
         } else if (status == ReachableViaWWAN) {
-            [device setObject:@"Mobile" forKey:@"Network"];
+            [device setObject:@"Reachable via Mobile" forKey:@"Network"];
         }
         
         NSDictionary *memoryStats = [UIDevice memoryStats];
