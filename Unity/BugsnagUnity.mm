@@ -56,7 +56,7 @@ extern "C" {
         NSRegularExpression *manualNotifyExpression = [NSRegularExpression regularExpressionWithPattern:@"at\\s(\\S+).+?(<filename unknown>|\\S+):(\\d*)\\s*"
                                                                                                 options:NSRegularExpressionCaseInsensitive
                                                                                                   error:nil];
-        NSRegularExpression *autoNotifyExpression = [NSRegularExpression regularExpressionWithPattern:@"\\s*(\\S+)\\ \\(.*?(?:([\\\\\\/]\\S*?):(\\d*)|\\n)"
+        NSRegularExpression *autoNotifyExpression = [NSRegularExpression regularExpressionWithPattern:@"\\s*(\\S+) \\(.*?(?:at (\\S*?):(\\d*)|\\n)"
                                                                                               options:NSRegularExpressionCaseInsensitive
                                                                                                 error:nil];
         
@@ -90,16 +90,22 @@ extern "C" {
         [stacktraceRegex enumerateMatchesInString:stackTrace options:0 range:NSMakeRange(0, [stackTrace length]) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
             NSMutableDictionary *lineDetails = [[NSMutableDictionary alloc] initWithCapacity:3];
             if(result) {
-                if(result.numberOfRanges >= 1) {
+                if(result.numberOfRanges >= 1 && [result rangeAtIndex:1].location != NSNotFound) {
                     [lineDetails setObject:[stackTrace substringWithRange:[result rangeAtIndex:1]] forKey:@"method"];
+                } else {
+                    [lineDetails setObject:@"unknown method" forKey:@"method"];
                 }
                 
-                if(result.numberOfRanges >= 2) {
+                if(result.numberOfRanges >= 2 && [result rangeAtIndex:2].location != NSNotFound) {
                     [lineDetails setObject:[stackTrace substringWithRange:[result rangeAtIndex:2]] forKey:@"file"];
+                } else {
+                    [lineDetails setObject:@"unknown file" forKey:@"file"];
                 }
                 
-                if(result.numberOfRanges >= 3) {
+                if(result.numberOfRanges >= 3 && [result rangeAtIndex:3].location != NSNotFound) {
                     [lineDetails setObject:[NSNumber numberWithInt:[[stackTrace substringWithRange:[result rangeAtIndex:3]] integerValue]] forKey:@"lineNumber"];
+                } else {
+                    [lineDetails setObject:[NSNumber numberWithInt:0] forKey:@"lineNumber"];
                 }
             } else {
                 [lineDetails setObject:@"unknown method" forKey:@"method"];
