@@ -84,65 +84,72 @@
                                    stackTrace:(NSArray*)stacktrace
                                      metaData:(NSDictionary*)passedMetaData {
     NSMutableDictionary *event = [[[NSMutableDictionary alloc] init] autorelease];
-    [event setObject:[Bugsnag instance].userId forKey:@"userId"];
-    [event setObject:[Bugsnag instance].appVersion forKey:@"appVersion"];
-    [event setObject:[UIDevice osVersion] forKey:@"osVersion"];
-    [event setObject:[Bugsnag instance].releaseStage forKey:@"releaseStage"];
-    [event setObject:[Bugsnag instance].context forKey:@"context"];
     
-    NSMutableDictionary *exceptionDetails = [[NSMutableDictionary alloc] init];
-    NSArray *exceptions = [[NSArray alloc] initWithObjects:exceptionDetails, nil];
-    [exceptionDetails release];
-    [event setObject:exceptions forKey:@"exceptions"];
-    [exceptions release];
-    
-    [exceptionDetails setObject:errorClass forKey:@"errorClass"];
-    [exceptionDetails setObject:errorMessage forKey:@"message"];
-    [exceptionDetails setObject:stacktrace forKey:@"stacktrace"];
-    
-    BugsnagMetaData *metaData = [[Bugsnag instance].metaData mutableCopy];
-    [event setObject:metaData.dictionary forKey:@"metaData"];
-    [metaData autorelease];
-    
-    NSMutableDictionary *device = [metaData getTab:@"device"];
-    
-    [device setObject:[UIDevice platform] forKey:@"Device"];
-    [device setObject:[UIDevice arch] forKey:@"Architecture"];
-    [device setObject:[UIDevice osVersion] forKey:@"OS Version"];
-    [device setObject:[[UIDevice uptime] durationString] forKey:@"Time since boot"];
-    
-    Reachability *reachability = [Reachability reachabilityForInternetConnection];
-    [reachability startNotifier];
-    NetworkStatus status = [reachability currentReachabilityStatus];
-    [reachability stopNotifier];
-    
-    if(status == NotReachable) {
-        [device setObject:@"None" forKey:@"Network"];
-    } else if (status == ReachableViaWiFi) {
-        [device setObject:@"WiFi" forKey:@"Network"];
-    } else if (status == ReachableViaWWAN) {
-        [device setObject:@"3G" forKey:@"Network"];
+    @try {
+        [event setObject:[Bugsnag instance].userId forKey:@"userId"];
+        [event setObject:[Bugsnag instance].appVersion forKey:@"appVersion"];
+        [event setObject:[UIDevice osVersion] forKey:@"osVersion"];
+        [event setObject:[Bugsnag instance].releaseStage forKey:@"releaseStage"];
+        [event setObject:[Bugsnag instance].context forKey:@"context"];
+        
+        NSMutableDictionary *exceptionDetails = [[NSMutableDictionary alloc] init];
+        NSArray *exceptions = [[NSArray alloc] initWithObjects:exceptionDetails, nil];
+        [exceptionDetails release];
+        [event setObject:exceptions forKey:@"exceptions"];
+        [exceptions release];
+        
+        [exceptionDetails setObject:errorClass forKey:@"errorClass"];
+        [exceptionDetails setObject:errorMessage forKey:@"message"];
+        [exceptionDetails setObject:stacktrace forKey:@"stacktrace"];
+        
+        BugsnagMetaData *metaData = [[Bugsnag instance].metaData mutableCopy];
+        [event setObject:metaData.dictionary forKey:@"metaData"];
+        [metaData autorelease];
+        
+        NSMutableDictionary *device = [metaData getTab:@"device"];
+        
+        [device setObject:[UIDevice platform] forKey:@"Device"];
+        [device setObject:[UIDevice arch] forKey:@"Architecture"];
+        [device setObject:[UIDevice osVersion] forKey:@"iOS Version"];
+        [device setObject:[[UIDevice uptime] durationString] forKey:@"Time since boot"];
+        
+        Reachability *reachability = [Reachability reachabilityForInternetConnection];
+        [reachability startNotifier];
+        NetworkStatus status = [reachability currentReachabilityStatus];
+        [reachability stopNotifier];
+        
+        if(status == NotReachable) {
+            [device setObject:@"None" forKey:@"Network"];
+        } else if (status == ReachableViaWiFi) {
+            [device setObject:@"WiFi" forKey:@"Network"];
+        } else if (status == ReachableViaWWAN) {
+            [device setObject:@"Mobile" forKey:@"Network"];
+        }
+        
+        NSDictionary *memoryStats = [UIDevice memoryStats];
+        if(memoryStats) {
+            [device setObject:memoryStats forKey:@"Memory"];
+        }
+        
+        NSMutableDictionary *application = [metaData getTab:@"application"];
+        
+        [application setObject:NSStringFromClass([[UIViewController getVisible] class]) forKey:@"Top View Comtroller"];
+        [application setObject:[Bugsnag instance].appVersion forKey:@"App Version"];
+        [application setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"Bundle Identifier"];
+        
+        NSMutableDictionary *session = [metaData getTab:@"session"];
+        
+        [session setObject:[[Bugsnag instance].sessionLength durationString] forKey:@"Session Length"];
+        [session setObject:[NSNumber numberWithBool:[Bugsnag instance].inForeground] forKey:@"In Foreground"];
+        
+        if(passedMetaData) {
+            [metaData mergeWith:passedMetaData];
+        }
+    }
+    @catch (NSException *exception) {
+        BugLog(@"Exception while creating bugsnag event: %@", exception);
     }
     
-    NSDictionary *memoryStats = [UIDevice memoryStats];
-    if(memoryStats) {
-        [device setObject:memoryStats forKey:@"Memory"];
-    }
-    
-    NSMutableDictionary *application = [metaData getTab:@"application"];
-    
-    [application setObject:NSStringFromClass([[UIViewController getVisible] class]) forKey:@"Top View Comtroller"];
-    [application setObject:[Bugsnag instance].appVersion forKey:@"App Version"];
-    [application setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"Bundle Identifier"];
-    
-    NSMutableDictionary *session = [metaData getTab:@"session"];
-    
-    [session setObject:[[Bugsnag instance].sessionLength durationString] forKey:@"Session Length"];
-    [session setObject:[NSNumber numberWithBool:[Bugsnag instance].inForeground] forKey:@"In Foreground"];
-    
-    if(passedMetaData) {
-        [metaData mergeWith:passedMetaData];
-    }
     return event;
 }
 
