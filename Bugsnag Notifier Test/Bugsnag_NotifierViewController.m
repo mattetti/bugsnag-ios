@@ -27,8 +27,28 @@
     [NSException raise:@"BugsnagException" format:@"Test exception."];
 }
 
--(IBAction) generateNonFatalException:(UIButton*)sender {
+- (IBAction) generateNonFatalException:(UIButton*)sender {
     [Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil]];
+}
+
+- (IBAction) delayedNotify:(UIButton*)sender {
+    [self performSelector:@selector(generateNonFatalException:) withObject:sender afterDelay:5];
+}
+
+- (IBAction)nonFatalWithMetaData:(id)sender {
+    [Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil] withData:[NSDictionary dictionaryWithObjectsAndKeys:[NSDictionary dictionaryWithObjectsAndKeys:@"metaDataValue", @"metaDataKey", nil], @"metaDataTab", nil]];
+}
+
+- (IBAction)nonFatalWithCustomData:(id)sender {
+    [Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil] withData:[NSDictionary dictionaryWithObject:@"customDataValue" forKey:@"customDataKey"]];
+}
+
+- (IBAction)addUserToTab:(id)sender {
+    [Bugsnag addAttribute:@"attributeNameUser" withValue:@"attributeValueUser" toTabWithName:@"user"];
+}
+
+- (IBAction)addDeviceToTab:(id)sender {
+    [Bugsnag addAttribute:@"attributeNameDevice" withValue:@"attributeValueDevice" toTabWithName:@"device"];
 }
 
 #pragma mark - View lifecycle
@@ -54,4 +74,7 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)dealloc {
+    [super dealloc];
+}
 @end

@@ -17,7 +17,7 @@ capturing exceptions from your applications.
 Installation & Setup
 --------------------
 
-Include Bugsnag.h and Bugsnag.m in your Xcode project.
+Include all files in the `Bugsnag Plugin` folder in your Xcode project.
 
 Import the `Bugsnag.h` file into your application delegate.
 
@@ -33,17 +33,14 @@ In your application:didFinishLaunchingWithOptions: method, register with bugsnag
 
 ###JSON Library
 
-The Bugsnag iOS notifier requires a JSON library in order to function. It is able to use
-the library included in iOS 5 if running on an iOS 5 device. Otherwise it looks for any of the
-following libraries:
+The Bugsnag iOS notifier requires a JSON library in order to function. It is able to use the library included in iOS 5 if running on an iOS 5 device. Otherwise it looks for any of the following libraries:
 
 - [JSONKit](https://github.com/johnezang/JSONKit)
 - [NextiveJson](https://github.com/nextive/NextiveJson)
 - [SBJson](https://stig.github.com/json-framework/)
 - [YAJL](https://lloyd.github.com/yajl/)
 
-If none of these libraries are present, the iOS notifier will be unable to notify Bugsnag of
-an error.
+If none of these libraries are present, the iOS notifier will be unable to notify Bugsnag of an error.
 
 
 Send Non-Fatal Exceptions to Bugsnag
@@ -59,10 +56,33 @@ If you would like to send non-fatal exceptions to Bugsnag, you can pass any
 You can also send additional meta-data with your exception:
 
 ```objective-c
-[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil]
+[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil] 
        withData:[NSDictionary dictionaryWithObjectsAndKeys:@"username", @"bob-hoskins", nil]];
 ```
 
+Adding Tabs to Bugsnag Error Reports
+------------------------------------
+
+If you want to add a tab to your Bugsnag error report, you can call the `addToTab` method:
+
+```objective-c
+[Bugsnag addAttribute:@"username" withValue:@"bob-hoskins" toTabWithName:@"user"];
+[Bugsnag addAttribute:@"registered-user" withValue:@"yes" toTabWithName:@"user"];
+```
+
+This will add a user tab to any error report sent to bugsnag.com that contains the username and whether the user was registered or not.
+
+You can clear a single attribute on a tab by calling:
+
+```objective-c
+[Bugsnag addAttribute:@"username" withValue:nil toTabWithName:@"user"];
+```
+
+or you can clear the entire tab:
+
+```objective-c
+[Bugsnag clearTabWithName:@"user"];
+```
 
 Configuration
 -------------
@@ -127,39 +147,13 @@ in your application. If you want to stop this from happening, you can set
 [Bugsnag instance].autoNotify = NO;
 ```
 
-###extraData
-
-It if often very useful to send some extra application or user specific 
-data along with every exception. To do this, you can set the
-`extraData` property:
-    
-```objective-c
-[Bugsnag instance].extraData = [NSDictionary dictionaryWithObjectsAndKeys:@"bob-hoskins", @"username", nil];
-```
-
-###dataFilters
-
-Sets the strings to filter out from the `extraData` dictionary before sending
-them to Bugsnag. Use this if you want to ensure you don't send 
-sensitive data such as passwords, and credit card numbers to our 
-servers. Any keys which contain these strings will be filtered.
-
-```objective-c
-[Bugsnag instance].dataFilters = [NSArray arrayWithObjects:@"password",@"credit-card-number",nil];
-```
-
-By default, `dataFilters` is set to `[NSArray arrayWithObject:@"password"]`
-
 ###enableSSL
 
-Enables the use of SSL encryption when sending errors to Bugsnag. Enable this if you require the
-extra security
+Enables the use of SSL encryption when sending errors to Bugsnag. Enable this if you require the extra security
 
 ```objective-c
 [Bugsnag instance].enableSSL = NO;
 ```
-
-By default, `enableSSL` is set to `NO`.
 
 
 Reporting Bugs or Feature Requests

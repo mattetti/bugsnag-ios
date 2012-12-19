@@ -13,5 +13,10 @@
 -(IBAction) generateException:(UIButton*)sender;
 -(IBAction) generateSignal:(UIButton*)sender;
 -(IBAction) generateNonFatalException:(UIButton*)sender;
+-(IBAction) delayedNotify:(UIButton*)sender;
+-(IBAction)nonFatalWithMetaData:(id)sender;
+-(IBAction)nonFatalWithCustomData:(id)sender;
+-(IBAction)addUserToTab:(id)sender;
+-(IBAction)addDeviceToTab:(id)sender;
 
 @end
