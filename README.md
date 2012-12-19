@@ -56,7 +56,8 @@ If you would like to send non-fatal exceptions to Bugsnag, you can pass any
 You can also send additional meta-data with your exception:
 
 ```objective-c
-[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil] withData:[NSDictionary dictionaryWithObjectsAndKeys:@"username", @"bob-hoskins", nil]];
+[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil] 
+       withData:[NSDictionary dictionaryWithObjectsAndKeys:@"username", @"bob-hoskins", nil]];
 ```
 
 Adding Tabs to Bugsnag Error Reports
