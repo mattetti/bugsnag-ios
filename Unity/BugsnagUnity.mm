@@ -53,7 +53,7 @@ extern "C" {
     void Notify(char *errorClass, char *errorMessage, char *stackTrace) {
         NSString *ns_stackTrace = [NSString stringWithUTF8String:stackTrace];
         
-        NSRegularExpression *unityExpression = [NSRegularExpression regularExpressionWithPattern:@"(\\S+)\\s*\\(.*?\\)\\s*(?:(?:\\[.*\\]\\s*in|\\(at\\s*\\s*)(.*):(\\d+))?"
+        NSRegularExpression *unityExpression = [NSRegularExpression regularExpressionWithPattern:@"(\\S+)\\s*\\(.*?\\)\\s*(?:(?:\\[.*\\]\\s*in\\s|\\(at\\s*\\s*)(.*):(\\d+))?"
                                                                                          options:NSRegularExpressionCaseInsensitive
                                                                                            error:nil];
         
