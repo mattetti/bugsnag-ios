@@ -53,20 +53,11 @@ extern "C" {
     void Notify(char *errorClass, char *errorMessage, char *stackTrace) {
         NSString *ns_stackTrace = [NSString stringWithUTF8String:stackTrace];
         
-        NSRegularExpression *manualNotifyExpression = [NSRegularExpression regularExpressionWithPattern:@"at\\s(\\S+).+?(<filename unknown>|\\S+):(\\d*)\\s*"
-                                                                                                options:NSRegularExpressionCaseInsensitive
-                                                                                                  error:nil];
-        NSRegularExpression *autoNotifyExpression = [NSRegularExpression regularExpressionWithPattern:@"\\s*(\\S+) \\(.*?(?:at (\\S*?):(\\d*)|\\n)"
-                                                                                              options:NSRegularExpressionCaseInsensitive
-                                                                                                error:nil];
+        NSRegularExpression *unityExpression = [NSRegularExpression regularExpressionWithPattern:@"(\\S+)\\s*\\(.*?\\)\\s*(?:(?:\\[.*\\]\\s*in|\\(at\\s*\\s*)(.*):(\\d+))?"
+                                                                                         options:NSRegularExpressionCaseInsensitive
+                                                                                           error:nil];
         
-        NSMutableArray *stacktrace;
-        
-        if([ns_stackTrace hasPrefix:@"  at "]) {
-            stacktrace = parseStackTrace(ns_stackTrace, manualNotifyExpression);
-        } else {
-            stacktrace = parseStackTrace(ns_stackTrace, autoNotifyExpression);
-        }
+        NSMutableArray *stacktrace = parseStackTrace(ns_stackTrace, unityExpression);
         
         
         NSDictionary *event = [BugsnagEvent generateEventFromErrorClass:[NSString stringWithUTF8String:errorClass]
@@ -82,6 +73,8 @@ extern "C" {
         
         NSString *ns_apiKey = [NSString stringWithUTF8String: apiKey];
         [Bugsnag startBugsnagWithApiKey:ns_apiKey];
+        
+        [Bugsnag instance].notifyReleaseStages = [NSArray arrayWithObjects:@"production", @"development", nil];
     }
     
     NSMutableArray *parseStackTrace(NSString *stackTrace, NSRegularExpression *stacktraceRegex) {
@@ -97,7 +90,12 @@ extern "C" {
                 }
                 
                 if(result.numberOfRanges >= 2 && [result rangeAtIndex:2].location != NSNotFound) {
-                    [lineDetails setObject:[stackTrace substringWithRange:[result rangeAtIndex:2]] forKey:@"file"];
+                    NSString *fileName = [stackTrace substringWithRange:[result rangeAtIndex:2]];
+                    if(![fileName isEqualToString:@"<filename unknown>"]) {
+                        [lineDetails setObject:fileName forKey:@"file"];
+                    } else {
+                        [lineDetails setObject:@"unknown file" forKey:@"file"];
+                    }
                 } else {
                     [lineDetails setObject:@"unknown file" forKey:@"file"];
                 }
