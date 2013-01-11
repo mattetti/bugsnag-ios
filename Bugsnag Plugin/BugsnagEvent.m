@@ -156,7 +156,7 @@
 + (NSArray*) getCallStackFromFrames:(void*)frames andCount:(int)count startingAt:(int)start {
 	char **strs = backtrace_symbols(frames, count);
     
-    NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]*(.*)(0x[0-9A-Fa-f]{8}) ([+-].+?]|[A-Za-z0-9_]+)"
+    NSRegularExpression *stacktraceRegex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]+\\s+(.*)\\s*(0x[0-9A-Fa-f]*)\\s*(.*)\\s*\\+"
                                                                                      options:NSRegularExpressionCaseInsensitive
                                                                                        error:nil];
     
@@ -172,7 +172,7 @@
             
             NSString *method = [[entry substringWithRange:[firstMatch rangeAtIndex:3]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             NSString *file = [packageName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            NSNumber *lineNumber = [NSNumber numberWithInt:[[entry substringWithRange:[firstMatch rangeAtIndex:2]] integerValue]];
+            NSString *lineNumber = [entry substringWithRange:[firstMatch rangeAtIndex:2]];
             
             if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] && ![method hasPrefix:@"+[Bugsnag "] && ![method hasPrefix:@"+[BugsnagEvent "]) {
                 [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
