@@ -25,6 +25,8 @@ Import the `Bugsnag.h` file into your application delegate.
 #import "Bugsnag.h"
 ```
 
+Add `SystemConfiguration.framework` to your Link Binary With Libraries section in your project's Build Phases.
+
 In your application:didFinishLaunchingWithOptions: method, register with bugsnag by calling,
 
 ```objective-c
