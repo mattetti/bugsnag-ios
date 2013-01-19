@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://bugsnag.com"
   s.license      = 'MIT'
   s.author       = { "Bugsnag" => "notifiers@bugsnag.com" }
-  s.source       = { :git => "https://github.com/bugsnag/bugsnag-ios.git", :tag => "2.1.0" }
+  s.source       = { :git => "https://github.com/bugsnag/bugsnag-ios.git", :tag => "2.2.0" }
   s.platform     = :ios, '4.0'
   s.source_files = ['Bugsnag Plugin', 'Bugsnag Plugin/Categories']
   s.requires_arc = true
