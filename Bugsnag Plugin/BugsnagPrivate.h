@@ -5,8 +5,8 @@
 - (id) init;
 - (BOOL) shouldAutoNotify;
 
-@property (retain) BugsnagMetaData *metaData;
-@property (retain) NSDate *sessionStartDate;
-@property (readonly) NSNumber *sessionLength;
+@property (strong) BugsnagMetaData *metaData;
+@property (strong) NSDate *sessionStartDate;
+@property (unsafe_unretained, readonly) NSNumber *sessionLength;
 @property BOOL inForeground;
 @end

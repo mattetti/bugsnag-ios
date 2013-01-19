@@ -6,7 +6,7 @@
 #import <Foundation/Foundation.h>
 #import <mach/mach.h>
 
-#import "UIViewController+Visibility.h"
+#import "UIViewController+BSVisibility.h"
 
 #import "Bugsnag.h"
 #import "BugsnagEvent.h"
@@ -129,12 +129,12 @@ void handle_exception(NSException *exception) {
         _appVersion = nil;
         _userId = nil;
         _uuid = nil;
-        [self.metaData = [[BugsnagMetaData alloc] init] release];
+        self.metaData = [[BugsnagMetaData alloc] init];
         self.sessionStartDate = [NSDate date];
         self.enableSSL = YES;
         self.autoNotify = YES;
         self.inForeground = YES;
-        self.notifyReleaseStages = [NSArray arrayWithObject:@"production"];
+        self.notifyReleaseStages = [NSArray arrayWithObjects:@"production", @"development", nil];
         
         NSSetUncaughtExceptionHandler(&handle_exception);
         
@@ -164,7 +164,7 @@ void handle_exception(NSException *exception) {
 - (NSString*) appVersion {
     @synchronized(self){
         if(_appVersion) {
-            return [[_appVersion copy] autorelease];
+            return [_appVersion copy];
         } else {
             NSString *bundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
             NSString *versionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
@@ -175,14 +175,13 @@ void handle_exception(NSException *exception) {
             } else if(versionString != nil) {
                 self.appVersion = versionString;
             }
-            return [[_appVersion copy] autorelease];
+            return [_appVersion copy];
         }
     }
 }
 
 - (void) setAppVersion:(NSString*)version {
     @synchronized(self) {
-        if (_appVersion) [_appVersion release];
         _appVersion = [version copy];
     }
 }
@@ -190,7 +189,7 @@ void handle_exception(NSException *exception) {
 - (NSString*) userId {
     @synchronized(self) {
         if(_userId) {
-            return [[_userId copy] autorelease];
+            return [_userId copy];
         } else {
             return self.uuid;
         }
@@ -199,53 +198,51 @@ void handle_exception(NSException *exception) {
 
 - (void) setUserId:(NSString *)userId {
     @synchronized(self) {
-        if(_userId) [_userId release];
         _userId = [userId copy];
     }
 }
 
 - (NSString*) context {
     @synchronized(self) {
-        if(_context) return [[_context copy] autorelease];
+        if(_context) return [_context copy];
         return NSStringFromClass([[UIViewController getVisible] class]);
     }
 }
 
 - (void) setContext:(NSString *)context {
     @synchronized(self) {
-        if(_context) [_context release];
         _context = [context copy];
     }
 }
 
 - (NSString*) uuid {
     @synchronized(self) {
-        if(_uuid) return [[_uuid copy] autorelease];
+        if(_uuid) return [_uuid copy];
         NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         if([folders count]) {
             NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
             
-            _uuid = [[NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil] retain];
+            _uuid = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
             if(_uuid) {
-                return [[_uuid copy] autorelease];
+                return [_uuid copy];
             } else {
                 CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-                _uuid = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+                _uuid = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuid));
                 CFRelease(uuid);
                 
                 [_uuid writeToFile:filename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
-                return [[_uuid copy] autorelease];
+                return [_uuid copy];
             }
         } else {
             _uuid = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
             if(_uuid) {
-                return [[_uuid copy] autorelease];
+                return [_uuid copy];
             } else {
                 CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-                [_uuid = (NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid) release];
+                _uuid = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuid));
                 CFRelease(uuid);
                 [[NSUserDefaults standardUserDefaults] setValue:_uuid forKey:@"bugsnag-user-id"];
-                return [[_uuid copy] autorelease];
+                return [_uuid copy];
             }
         }
     }

@@ -1,17 +1,17 @@
 //
-//  NSNumber+Duration
+//  NSNumber+BSDuration
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 12/7/12.
 //
 //
 
-#import "NSNumber+Duration.h"
+#import "NSNumber+BSDuration.h"
 
-@implementation NSNumber (Duration)
+@implementation NSNumber (BSDuration)
 
 - (NSString *) durationString {
-    NSDate *date = [[[NSDate alloc] initWithTimeIntervalSinceNow:-[self intValue]] autorelease];
+    NSDate *date = [[NSDate alloc] initWithTimeIntervalSinceNow:-[self intValue]];
     NSCalendar *sysCalendar = [NSCalendar currentCalendar];
     
     unsigned int unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit | NSDayCalendarUnit | NSMonthCalendarUnit | NSSecondCalendarUnit | NSYearCalendarUnit;
@@ -61,7 +61,7 @@
         entries++;
     }
     
-    return [result autorelease];
+    return result;
 }
 
 @end

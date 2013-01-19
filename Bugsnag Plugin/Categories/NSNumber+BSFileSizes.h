@@ -1,5 +1,5 @@
 //
-//  NSNumber+FileSizes.h
+//  NSNumber+BSFileSizes.h
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 12/6/12.
@@ -8,6 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSNumber (FileSizes)
+@interface NSNumber (BSFileSizes)
 - (NSString *)fileSize;
 @end

@@ -1,14 +1,14 @@
 //
-//  NSMutableDictionary+Merge.m
+//  NSMutableDictionary+BSMerge.m
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 12/6/12.
 //
 //
 
-#import "NSMutableDictionary+Merge.h"
+#import "NSMutableDictionary+BSMerge.h"
 
-@implementation NSMutableDictionary (Merge)
+@implementation NSMutableDictionary (BSMerge)
 + (void) merge: (NSDictionary*) source into:(NSMutableDictionary*) destination {
     [source enumerateKeysAndObjectsUsingBlock: ^(id key, id value, BOOL *stop) {
         if ([destination objectForKey:key] && [value isKindOfClass:[NSDictionary class]]) {

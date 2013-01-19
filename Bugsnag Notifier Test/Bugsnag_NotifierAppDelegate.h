@@ -12,8 +12,8 @@
 
 @interface Bugsnag_NotifierAppDelegate : NSObject <UIApplicationDelegate>
 
-@property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, strong) IBOutlet UIWindow *window;
 
-@property (nonatomic, retain) IBOutlet Bugsnag_NotifierViewController *viewController;
+@property (nonatomic, strong) IBOutlet Bugsnag_NotifierViewController *viewController;
 
 @end

@@ -10,7 +10,7 @@
 
 @interface BugsnagMetaData : NSObject < NSMutableCopying >
 
-@property (retain) NSMutableDictionary *dictionary;
+@property (strong) NSMutableDictionary *dictionary;
 
 - (id) initWithDictionary:(NSMutableDictionary*)dict;
 - (NSMutableDictionary *) getTab:(NSString*)tabName;

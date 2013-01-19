@@ -1,5 +1,5 @@
 //
-//  NSNumber+Duration
+//  NSNumber+BSDuration
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 12/7/12.
@@ -8,6 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSNumber (Duration)
+@interface NSNumber (BSDuration)
 - (NSString *) durationString;
 @end

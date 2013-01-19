@@ -7,7 +7,7 @@
 //
 
 #import "BugsnagMetaData.h"
-#import "NSMutableDictionary+Merge.h"
+#import "NSMutableDictionary+BSMerge.h"
 
 @implementation BugsnagMetaData
 
@@ -25,7 +25,7 @@
 
 - (id) mutableCopyWithZone:(NSZone *)zone {
     @synchronized(self) {
-        NSMutableDictionary *dict = [[self.dictionary mutableCopy] autorelease];
+        NSMutableDictionary *dict = [self.dictionary mutableCopy];
         return [[BugsnagMetaData alloc] initWithDictionary:dict];
     }
 }
