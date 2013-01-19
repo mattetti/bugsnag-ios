@@ -64,9 +64,9 @@ git clone git://github.com/bugsnag/bugsnag-ios.git
 
 ###ARC Support
 
-Since version 2.2.0 Bugsnag has fully supported Arc. If you wish to run a non-Arc build of Bugsnag you can use version 2.1.0.
+Since version 2.2.0 Bugsnag has fully supported Arc. If you wish to run a non-Arc build of Bugsnag you should use version 2.1.0 or older.
 
-If you are using Bugsnag 2.2.0 or newer in your non-arc project, you will need to set a `-fobjc-arc` compiler flag on all of the Bugsnag source files. Conversely, if you are adding a pre-2.1.0 version of Bugsnag, you will need to set a `-fno-objc-arc` compiler flag.
+If you are using Bugsnag 2.2.0 or newer in your non-arc project, you will need to set a `-fobjc-arc` compiler flag on all of the Bugsnag source files. Conversely, if you are adding a pre-2.2.0 version of Bugsnag, you will need to set a `-fno-objc-arc` compiler flag.
 
 To set a compiler flag in Xcode, go to your active target and select the "Build Phases" tab. Now select all Bugsnag source files, press Enter, insert `-fobjc-arc` or `-fno-objc-arc` and then "Done" to enable or disable ARC for Bugsnag. 
 
