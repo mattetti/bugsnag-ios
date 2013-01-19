@@ -73,14 +73,14 @@ To set a compiler flag in Xcode, go to your active target and select the "Build 
 JSON Library
 ------------
 
-The Bugsnag iOS notifier requires a JSON library in order to function. It is able to use the library included in iOS 5 if running on an iOS 5 device. Otherwise it looks for any of the following libraries:
+The Bugsnag iOS notifier requires a JSON library. It is able to use the library introduced in iOS 5 if it is available. Otherwise it looks for any of the following libraries:
 
 - [JSONKit](https://github.com/johnezang/JSONKit)
 - [NextiveJson](https://github.com/nextive/NextiveJson)
 - [SBJson](https://stig.github.com/json-framework/)
 - [YAJL](https://lloyd.github.com/yajl/)
 
-If none of these libraries are present, the iOS notifier will be unable to notify Bugsnag of an error.
+If you are targetting iOS 4.3 or older, you should include one of these libraries in your project to ensure you are notified of crashes on those versions of iOS.
 
 
 Send Non-Fatal Exceptions to Bugsnag
