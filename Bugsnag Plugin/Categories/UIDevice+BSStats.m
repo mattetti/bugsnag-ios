@@ -1,5 +1,5 @@
 //
-//  UIDevice+Stats.m
+//  UIDevice+BSStats.m
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 12/6/12.
@@ -11,10 +11,10 @@
 #import <mach/mach.h>
 #import <sys/sysctl.h>
 
-#import "NSNumber+FileSizes.h"
-#import "UIDevice+Stats.h"
+#import "NSNumber+BSFileSizes.h"
+#import "UIDevice+BSStats.h"
 
-@implementation UIDevice (Stats)
+@implementation UIDevice (BSStats)
 
 + (NSString*) platform {
     size_t size = 256;

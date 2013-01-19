@@ -1,14 +1,14 @@
 //
-//  UIViewController+Visibility.m
+//  UIViewController+BSVisibility.h
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 12/6/12.
 //
 //
 
-#import "UIViewController+Visibility.h"
+#import "UIViewController+BSVisibility.h"
 
-@implementation UIViewController (Visibility)
+@implementation UIViewController (BSVisibility)
 + (UIViewController *)getVisible {
     UIViewController *viewController = nil;
     UIViewController *visibleViewController = nil;

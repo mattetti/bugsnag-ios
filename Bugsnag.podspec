@@ -5,14 +5,15 @@ Pod::Spec.new do |s|
   s.homepage     = "https://bugsnag.com"
   s.license      = 'MIT'
   s.author       = { "Bugsnag" => "notifiers@bugsnag.com" }
-  s.source       = { :git => "https://github.com/bugsnag/bugsnag-ios.git" }
+  s.source       = { :git => "https://github.com/bugsnag/bugsnag-ios.git", :tag => "2.1.0" }
   s.platform     = :ios, '4.0'
-  s.source_files = 'Bugsnag Plugin'
+  s.source_files = ['Bugsnag Plugin', 'Bugsnag Plugin/Categories']
+  s.requires_arc = true
 
   # s.public_header_files = 'Classes/**/*.h'
   s.framework  = 'SystemConfiguration'
   
   # Finally, specify any Pods that this Pod depends on.
   #
-  # s.dependency 'JSONKit', '~> 1.4'
+  s.dependency 'Reachability', '~> 3.1'
 end

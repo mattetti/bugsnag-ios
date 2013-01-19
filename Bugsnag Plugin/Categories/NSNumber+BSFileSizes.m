@@ -1,14 +1,14 @@
 //
-//  NSNumber+FileSizes.m
+//  NSNumber+BSFileSizes.m
 //  Bugsnag Notifier
 //
 //  Created by Simon Maynard on 12/6/12.
 //
 //
 
-#import "NSNumber+FileSizes.h"
+#import "NSNumber+BSFileSizes.h"
 
-@implementation NSNumber (FileSizes)
+@implementation NSNumber (BSFileSizes)
 - (NSString *)fileSize {
     float fileSize = [self floatValue];
     if (fileSize<1023.0f)

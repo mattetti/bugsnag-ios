@@ -10,10 +10,10 @@
 #import "BugsnagEvent.h"
 #import "Bugsnag.h"
 #import "BugsnagLogging.h"
-#import "NSDictionary+JSON.h"
+#import "NSDictionary+BSJSON.h"
 #import "BugsnagPrivate.h"
 
-#define BUGSNAG_IOS_VERSION @"2.1.0"
+#define BUGSNAG_IOS_VERSION @"2.2.0"
 #define BUGSNAG_IOS_HOMEPAGE @"https://github.com/bugsnag/bugsnag-ios"
 
 static NSString *notifierName = @"iOS Bugsnag Notifier";
@@ -31,26 +31,24 @@ static NSString *notifierURL = BUGSNAG_IOS_HOMEPAGE;
     NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: notifierName, notifierVersion, notifierURL, nil]
                                                            forKeys:[NSArray arrayWithObjects: @"name", @"version", @"url", nil]];
     NSMutableArray *events = [[NSMutableArray alloc] init];
-    NSDictionary *notifierPayload = [[[NSDictionary alloc] initWithObjectsAndKeys:notifier, @"notifier", [Bugsnag instance].apiKey, @"apiKey", events, @"events", nil] autorelease];
+    NSDictionary *notifierPayload = [[NSDictionary alloc] initWithObjectsAndKeys:notifier, @"notifier", [Bugsnag instance].apiKey, @"apiKey", events, @"events", nil];
     
-    [notifier release];
-    [events release];
     return notifierPayload;
 }
 
 + (void) backgroundNotifyAndSend:(NSDictionary*)event {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
     
-    [BugsnagEvent writeEventToDisk:event];
-    [self sendCachedReports];
+        [BugsnagEvent writeEventToDisk:event];
+        [self sendCachedReports];
     
-    [pool release];
+    }
 }
 
 + (void) backgroundSendCachedReports {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    [self sendCachedReports];
-    [pool release];
+    @autoreleasepool {
+        [self sendCachedReports];
+    }
 }
 
 + (void) sendCachedReports {

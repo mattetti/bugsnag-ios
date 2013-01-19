@@ -74,7 +74,4 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)dealloc {
-    [super dealloc];
-}
 @end

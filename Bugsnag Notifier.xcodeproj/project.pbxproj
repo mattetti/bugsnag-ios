@@ -7,19 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		93260F2815998A53000F87AF /* Bugsnag.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F2715998A53000F87AF /* Bugsnag.m */; };
-		93260F8D15998AA6000F87AF /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F7515998AA6000F87AF /* NSObject+SBJson.m */; };
-		93260F8E15998AA6000F87AF /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F7815998AA6000F87AF /* SBJsonParser.m */; };
-		93260F8F15998AA6000F87AF /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F7A15998AA6000F87AF /* SBJsonStreamParser.m */; };
-		93260F9015998AA6000F87AF /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F7C15998AA6000F87AF /* SBJsonStreamParserAccumulator.m */; };
-		93260F9115998AA6000F87AF /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F7E15998AA6000F87AF /* SBJsonStreamParserAdapter.m */; };
-		93260F9215998AA6000F87AF /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F8015998AA6000F87AF /* SBJsonStreamParserState.m */; };
-		93260F9315998AA6000F87AF /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F8215998AA6000F87AF /* SBJsonStreamWriter.m */; };
-		93260F9415998AA6000F87AF /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F8415998AA6000F87AF /* SBJsonStreamWriterAccumulator.m */; };
-		93260F9515998AA6000F87AF /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F8615998AA6000F87AF /* SBJsonStreamWriterState.m */; };
-		93260F9615998AA6000F87AF /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F8815998AA6000F87AF /* SBJsonTokeniser.m */; };
-		93260F9715998AA6000F87AF /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F8A15998AA6000F87AF /* SBJsonUTF8Stream.m */; };
-		93260F9815998AA6000F87AF /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 93260F8C15998AA6000F87AF /* SBJsonWriter.m */; };
 		93F1E929142C5662005A297C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F1E928142C5662005A297C /* UIKit.framework */; };
 		93F1E92B142C5662005A297C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F1E92A142C5662005A297C /* Foundation.framework */; };
 		93F1E92D142C5662005A297C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F1E92C142C5662005A297C /* CoreGraphics.framework */; };
@@ -29,48 +16,22 @@
 		93F1E95C142C5A07005A297C /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E959142C5A07005A297C /* MainWindow.xib */; };
 		93F1E95F142C5A15005A297C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93F1E95D142C5A15005A297C /* InfoPlist.strings */; };
 		93F1E961142C5A22005A297C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F1E960142C5A22005A297C /* main.m */; };
-		F483048716717D8800310C2C /* BugsnagNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = F483048616717D8800310C2C /* BugsnagNotifier.m */; };
-		F483048B16717D9400310C2C /* BugsnagEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = F483048A16717D9400310C2C /* BugsnagEvent.m */; };
-		F483048E16717E0600310C2C /* NSNumber+FileSizes.m in Sources */ = {isa = PBXBuildFile; fileRef = F483048D16717E0600310C2C /* NSNumber+FileSizes.m */; };
-		F483049416718D7B00310C2C /* NSDictionary+JSON.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049316718D7B00310C2C /* NSDictionary+JSON.m */; };
-		F483049716719C6100310C2C /* UIViewController+Visibility.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049616719C6100310C2C /* UIViewController+Visibility.m */; };
-		F483049A16719C9800310C2C /* UIDevice+Stats.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049916719C9800310C2C /* UIDevice+Stats.m */; };
-		F483049D1671A04700310C2C /* NSMutableDictionary+Merge.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */; };
-		F48304A01671A6FC00310C2C /* BugsnagMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = F483049F1671A6FC00310C2C /* BugsnagMetaData.m */; };
 		F48304A61671F2B800310C2C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F48304A51671F2B800310C2C /* SystemConfiguration.framework */; };
-		F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */ = {isa = PBXBuildFile; fileRef = F48304A81671FB3E00310C2C /* NSNumber+Duration.m */; };
-		F4F3A0DC1678237D008CE078 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F3A0DB1678237D008CE078 /* Reachability.m */; };
-		F4F3A0F516795718008CE078 /* BugsnagUnity.mm in Sources */ = {isa = PBXBuildFile; fileRef = F4F3A0F416795718008CE078 /* BugsnagUnity.mm */; };
+		F4A4859C16AA0E2500CAD26D /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F4A4859B16AA0E2500CAD26D /* Default-568h@2x.png */; };
+		F4E0563B16AA4CC50047503D /* Bugsnag.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0562216AA4CC50047503D /* Bugsnag.m */; };
+		F4E0563C16AA4CC50047503D /* BugsnagEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0562416AA4CC50047503D /* BugsnagEvent.m */; };
+		F4E0563D16AA4CC50047503D /* BugsnagMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0562716AA4CC50047503D /* BugsnagMetaData.m */; };
+		F4E0563E16AA4CC50047503D /* BugsnagNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0562916AA4CC50047503D /* BugsnagNotifier.m */; };
+		F4E0563F16AA4CC50047503D /* NSDictionary+BSJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0562D16AA4CC50047503D /* NSDictionary+BSJSON.m */; };
+		F4E0564016AA4CC50047503D /* NSMutableDictionary+BSMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0562F16AA4CC50047503D /* NSMutableDictionary+BSMerge.m */; };
+		F4E0564116AA4CC50047503D /* NSNumber+BSDuration.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0563116AA4CC50047503D /* NSNumber+BSDuration.m */; };
+		F4E0564216AA4CC50047503D /* NSNumber+BSFileSizes.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0563316AA4CC50047503D /* NSNumber+BSFileSizes.m */; };
+		F4E0564316AA4CC50047503D /* UIDevice+BSStats.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0563516AA4CC50047503D /* UIDevice+BSStats.m */; };
+		F4E0564416AA4CC50047503D /* UIViewController+BSVisibility.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0563716AA4CC50047503D /* UIViewController+BSVisibility.m */; };
+		F4E0564516AA4CC50047503D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E0563A16AA4CC50047503D /* Reachability.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		93260F2615998A53000F87AF /* Bugsnag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bugsnag.h; path = "Bugsnag Plugin/Bugsnag.h"; sourceTree = "<group>"; };
-		93260F2715998A53000F87AF /* Bugsnag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Bugsnag.m; path = "Bugsnag Plugin/Bugsnag.m"; sourceTree = "<group>"; };
-		93260F7415998AA6000F87AF /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+SBJson.h"; path = "Bugsnag Notifier Test/NSObject+SBJson.h"; sourceTree = SOURCE_ROOT; };
-		93260F7515998AA6000F87AF /* NSObject+SBJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+SBJson.m"; path = "Bugsnag Notifier Test/NSObject+SBJson.m"; sourceTree = SOURCE_ROOT; };
-		93260F7615998AA6000F87AF /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJson.h; path = "Bugsnag Notifier Test/SBJson.h"; sourceTree = SOURCE_ROOT; };
-		93260F7715998AA6000F87AF /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonParser.h; path = "Bugsnag Notifier Test/SBJsonParser.h"; sourceTree = SOURCE_ROOT; };
-		93260F7815998AA6000F87AF /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonParser.m; path = "Bugsnag Notifier Test/SBJsonParser.m"; sourceTree = SOURCE_ROOT; };
-		93260F7915998AA6000F87AF /* SBJsonStreamParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParser.h; path = "Bugsnag Notifier Test/SBJsonStreamParser.h"; sourceTree = SOURCE_ROOT; };
-		93260F7A15998AA6000F87AF /* SBJsonStreamParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParser.m; path = "Bugsnag Notifier Test/SBJsonStreamParser.m"; sourceTree = SOURCE_ROOT; };
-		93260F7B15998AA6000F87AF /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAccumulator.h; path = "Bugsnag Notifier Test/SBJsonStreamParserAccumulator.h"; sourceTree = SOURCE_ROOT; };
-		93260F7C15998AA6000F87AF /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAccumulator.m; path = "Bugsnag Notifier Test/SBJsonStreamParserAccumulator.m"; sourceTree = SOURCE_ROOT; };
-		93260F7D15998AA6000F87AF /* SBJsonStreamParserAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserAdapter.h; path = "Bugsnag Notifier Test/SBJsonStreamParserAdapter.h"; sourceTree = SOURCE_ROOT; };
-		93260F7E15998AA6000F87AF /* SBJsonStreamParserAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserAdapter.m; path = "Bugsnag Notifier Test/SBJsonStreamParserAdapter.m"; sourceTree = SOURCE_ROOT; };
-		93260F7F15998AA6000F87AF /* SBJsonStreamParserState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamParserState.h; path = "Bugsnag Notifier Test/SBJsonStreamParserState.h"; sourceTree = SOURCE_ROOT; };
-		93260F8015998AA6000F87AF /* SBJsonStreamParserState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamParserState.m; path = "Bugsnag Notifier Test/SBJsonStreamParserState.m"; sourceTree = SOURCE_ROOT; };
-		93260F8115998AA6000F87AF /* SBJsonStreamWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriter.h; path = "Bugsnag Notifier Test/SBJsonStreamWriter.h"; sourceTree = SOURCE_ROOT; };
-		93260F8215998AA6000F87AF /* SBJsonStreamWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriter.m; path = "Bugsnag Notifier Test/SBJsonStreamWriter.m"; sourceTree = SOURCE_ROOT; };
-		93260F8315998AA6000F87AF /* SBJsonStreamWriterAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriterAccumulator.h; path = "Bugsnag Notifier Test/SBJsonStreamWriterAccumulator.h"; sourceTree = SOURCE_ROOT; };
-		93260F8415998AA6000F87AF /* SBJsonStreamWriterAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriterAccumulator.m; path = "Bugsnag Notifier Test/SBJsonStreamWriterAccumulator.m"; sourceTree = SOURCE_ROOT; };
-		93260F8515998AA6000F87AF /* SBJsonStreamWriterState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonStreamWriterState.h; path = "Bugsnag Notifier Test/SBJsonStreamWriterState.h"; sourceTree = SOURCE_ROOT; };
-		93260F8615998AA6000F87AF /* SBJsonStreamWriterState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonStreamWriterState.m; path = "Bugsnag Notifier Test/SBJsonStreamWriterState.m"; sourceTree = SOURCE_ROOT; };
-		93260F8715998AA6000F87AF /* SBJsonTokeniser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonTokeniser.h; path = "Bugsnag Notifier Test/SBJsonTokeniser.h"; sourceTree = SOURCE_ROOT; };
-		93260F8815998AA6000F87AF /* SBJsonTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonTokeniser.m; path = "Bugsnag Notifier Test/SBJsonTokeniser.m"; sourceTree = SOURCE_ROOT; };
-		93260F8915998AA6000F87AF /* SBJsonUTF8Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonUTF8Stream.h; path = "Bugsnag Notifier Test/SBJsonUTF8Stream.h"; sourceTree = SOURCE_ROOT; };
-		93260F8A15998AA6000F87AF /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonUTF8Stream.m; path = "Bugsnag Notifier Test/SBJsonUTF8Stream.m"; sourceTree = SOURCE_ROOT; };
-		93260F8B15998AA6000F87AF /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = "Bugsnag Notifier Test/SBJsonWriter.h"; sourceTree = SOURCE_ROOT; };
-		93260F8C15998AA6000F87AF /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = "Bugsnag Notifier Test/SBJsonWriter.m"; sourceTree = SOURCE_ROOT; };
 		93F1E924142C5662005A297C /* Bugsnag Notifier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bugsnag Notifier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		93F1E928142C5662005A297C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		93F1E92A142C5662005A297C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -85,30 +46,32 @@
 		93F1E960142C5A22005A297C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Bugsnag Notifier Test/main.m"; sourceTree = SOURCE_ROOT; };
 		93F1E962142C5A30005A297C /* Bugsnag Notifier-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Bugsnag Notifier-Info.plist"; path = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist"; sourceTree = SOURCE_ROOT; };
 		93F1E963142C5A30005A297C /* Bugsnag Notifier-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Bugsnag Notifier-Prefix.pch"; path = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch"; sourceTree = SOURCE_ROOT; };
-		F483048516717D8800310C2C /* BugsnagNotifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagNotifier.h; path = "Bugsnag Plugin/BugsnagNotifier.h"; sourceTree = "<group>"; };
-		F483048616717D8800310C2C /* BugsnagNotifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BugsnagNotifier.m; path = "Bugsnag Plugin/BugsnagNotifier.m"; sourceTree = "<group>"; };
-		F483048916717D9400310C2C /* BugsnagEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagEvent.h; path = "Bugsnag Plugin/BugsnagEvent.h"; sourceTree = "<group>"; };
-		F483048A16717D9400310C2C /* BugsnagEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BugsnagEvent.m; path = "Bugsnag Plugin/BugsnagEvent.m"; sourceTree = "<group>"; };
-		F483048C16717E0600310C2C /* NSNumber+FileSizes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSNumber+FileSizes.h"; path = "Bugsnag Plugin/NSNumber+FileSizes.h"; sourceTree = "<group>"; };
-		F483048D16717E0600310C2C /* NSNumber+FileSizes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNumber+FileSizes.m"; path = "Bugsnag Plugin/NSNumber+FileSizes.m"; sourceTree = "<group>"; };
-		F483048F167184CF00310C2C /* BugsnagLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagLogging.h; path = "Bugsnag Plugin/BugsnagLogging.h"; sourceTree = "<group>"; };
-		F483049216718D7B00310C2C /* NSDictionary+JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+JSON.h"; path = "Bugsnag Plugin/NSDictionary+JSON.h"; sourceTree = "<group>"; };
-		F483049316718D7B00310C2C /* NSDictionary+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+JSON.m"; path = "Bugsnag Plugin/NSDictionary+JSON.m"; sourceTree = "<group>"; };
-		F483049516719C6100310C2C /* UIViewController+Visibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIViewController+Visibility.h"; path = "Bugsnag Plugin/UIViewController+Visibility.h"; sourceTree = "<group>"; };
-		F483049616719C6100310C2C /* UIViewController+Visibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+Visibility.m"; path = "Bugsnag Plugin/UIViewController+Visibility.m"; sourceTree = "<group>"; };
-		F483049816719C9800310C2C /* UIDevice+Stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIDevice+Stats.h"; path = "Bugsnag Plugin/UIDevice+Stats.h"; sourceTree = "<group>"; };
-		F483049916719C9800310C2C /* UIDevice+Stats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIDevice+Stats.m"; path = "Bugsnag Plugin/UIDevice+Stats.m"; sourceTree = "<group>"; };
-		F483049B1671A04700310C2C /* NSMutableDictionary+Merge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableDictionary+Merge.h"; path = "Bugsnag Plugin/NSMutableDictionary+Merge.h"; sourceTree = "<group>"; };
-		F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSMutableDictionary+Merge.m"; path = "Bugsnag Plugin/NSMutableDictionary+Merge.m"; sourceTree = "<group>"; };
-		F483049E1671A6FC00310C2C /* BugsnagMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagMetaData.h; path = "Bugsnag Plugin/BugsnagMetaData.h"; sourceTree = "<group>"; };
-		F483049F1671A6FC00310C2C /* BugsnagMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BugsnagMetaData.m; path = "Bugsnag Plugin/BugsnagMetaData.m"; sourceTree = "<group>"; };
-		F48304A11671BA8300310C2C /* BugsnagPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BugsnagPrivate.h; path = "Bugsnag Plugin/BugsnagPrivate.h"; sourceTree = "<group>"; };
 		F48304A51671F2B800310C2C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		F48304A71671FB3D00310C2C /* NSNumber+Duration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSNumber+Duration.h"; path = "Bugsnag Plugin/NSNumber+Duration.h"; sourceTree = "<group>"; };
-		F48304A81671FB3E00310C2C /* NSNumber+Duration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNumber+Duration.m"; path = "Bugsnag Plugin/NSNumber+Duration.m"; sourceTree = "<group>"; };
-		F4F3A0DA1678237D008CE078 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = "Bugsnag Plugin/Reachability.h"; sourceTree = "<group>"; };
-		F4F3A0DB1678237D008CE078 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = "Bugsnag Plugin/Reachability.m"; sourceTree = "<group>"; };
-		F4F3A0F416795718008CE078 /* BugsnagUnity.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BugsnagUnity.mm; path = Unity/BugsnagUnity.mm; sourceTree = "<group>"; };
+		F4A4859B16AA0E2500CAD26D /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		F4E0562116AA4CC50047503D /* Bugsnag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bugsnag.h; sourceTree = "<group>"; };
+		F4E0562216AA4CC50047503D /* Bugsnag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Bugsnag.m; sourceTree = "<group>"; };
+		F4E0562316AA4CC50047503D /* BugsnagEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagEvent.h; sourceTree = "<group>"; };
+		F4E0562416AA4CC50047503D /* BugsnagEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagEvent.m; sourceTree = "<group>"; };
+		F4E0562516AA4CC50047503D /* BugsnagLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagLogging.h; sourceTree = "<group>"; };
+		F4E0562616AA4CC50047503D /* BugsnagMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagMetaData.h; sourceTree = "<group>"; };
+		F4E0562716AA4CC50047503D /* BugsnagMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagMetaData.m; sourceTree = "<group>"; };
+		F4E0562816AA4CC50047503D /* BugsnagNotifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagNotifier.h; sourceTree = "<group>"; };
+		F4E0562916AA4CC50047503D /* BugsnagNotifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagNotifier.m; sourceTree = "<group>"; };
+		F4E0562A16AA4CC50047503D /* BugsnagPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagPrivate.h; sourceTree = "<group>"; };
+		F4E0562C16AA4CC50047503D /* NSDictionary+BSJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+BSJSON.h"; sourceTree = "<group>"; };
+		F4E0562D16AA4CC50047503D /* NSDictionary+BSJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+BSJSON.m"; sourceTree = "<group>"; };
+		F4E0562E16AA4CC50047503D /* NSMutableDictionary+BSMerge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+BSMerge.h"; sourceTree = "<group>"; };
+		F4E0562F16AA4CC50047503D /* NSMutableDictionary+BSMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+BSMerge.m"; sourceTree = "<group>"; };
+		F4E0563016AA4CC50047503D /* NSNumber+BSDuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNumber+BSDuration.h"; sourceTree = "<group>"; };
+		F4E0563116AA4CC50047503D /* NSNumber+BSDuration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNumber+BSDuration.m"; sourceTree = "<group>"; };
+		F4E0563216AA4CC50047503D /* NSNumber+BSFileSizes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNumber+BSFileSizes.h"; sourceTree = "<group>"; };
+		F4E0563316AA4CC50047503D /* NSNumber+BSFileSizes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNumber+BSFileSizes.m"; sourceTree = "<group>"; };
+		F4E0563416AA4CC50047503D /* UIDevice+BSStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+BSStats.h"; sourceTree = "<group>"; };
+		F4E0563516AA4CC50047503D /* UIDevice+BSStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+BSStats.m"; sourceTree = "<group>"; };
+		F4E0563616AA4CC50047503D /* UIViewController+BSVisibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+BSVisibility.h"; sourceTree = "<group>"; };
+		F4E0563716AA4CC50047503D /* UIViewController+BSVisibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+BSVisibility.m"; sourceTree = "<group>"; };
+		F4E0563916AA4CC50047503D /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		F4E0563A16AA4CC50047503D /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,43 +89,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		93260F7315998A9B000F87AF /* JSON */ = {
-			isa = PBXGroup;
-			children = (
-				93260F7415998AA6000F87AF /* NSObject+SBJson.h */,
-				93260F7515998AA6000F87AF /* NSObject+SBJson.m */,
-				93260F7615998AA6000F87AF /* SBJson.h */,
-				93260F7715998AA6000F87AF /* SBJsonParser.h */,
-				93260F7815998AA6000F87AF /* SBJsonParser.m */,
-				93260F7915998AA6000F87AF /* SBJsonStreamParser.h */,
-				93260F7A15998AA6000F87AF /* SBJsonStreamParser.m */,
-				93260F7B15998AA6000F87AF /* SBJsonStreamParserAccumulator.h */,
-				93260F7C15998AA6000F87AF /* SBJsonStreamParserAccumulator.m */,
-				93260F7D15998AA6000F87AF /* SBJsonStreamParserAdapter.h */,
-				93260F7E15998AA6000F87AF /* SBJsonStreamParserAdapter.m */,
-				93260F7F15998AA6000F87AF /* SBJsonStreamParserState.h */,
-				93260F8015998AA6000F87AF /* SBJsonStreamParserState.m */,
-				93260F8115998AA6000F87AF /* SBJsonStreamWriter.h */,
-				93260F8215998AA6000F87AF /* SBJsonStreamWriter.m */,
-				93260F8315998AA6000F87AF /* SBJsonStreamWriterAccumulator.h */,
-				93260F8415998AA6000F87AF /* SBJsonStreamWriterAccumulator.m */,
-				93260F8515998AA6000F87AF /* SBJsonStreamWriterState.h */,
-				93260F8615998AA6000F87AF /* SBJsonStreamWriterState.m */,
-				93260F8715998AA6000F87AF /* SBJsonTokeniser.h */,
-				93260F8815998AA6000F87AF /* SBJsonTokeniser.m */,
-				93260F8915998AA6000F87AF /* SBJsonUTF8Stream.h */,
-				93260F8A15998AA6000F87AF /* SBJsonUTF8Stream.m */,
-				93260F8B15998AA6000F87AF /* SBJsonWriter.h */,
-				93260F8C15998AA6000F87AF /* SBJsonWriter.m */,
-			);
-			name = JSON;
-			sourceTree = "<group>";
-		};
 		93F1E919142C5662005A297C = {
 			isa = PBXGroup;
 			children = (
-				F4F3A0F1167956EF008CE078 /* Unity */,
-				93F1E968142C5A60005A297C /* Bugsnag Plugin */,
+				F4E0562016AA4CC50047503D /* Bugsnag Plugin */,
+				F4A4859B16AA0E2500CAD26D /* Default-568h@2x.png */,
 				93F1E92E142C5662005A297C /* Bugsnag Notifier Test */,
 				93F1E927142C5662005A297C /* Frameworks */,
 				93F1E925142C5662005A297C /* Products */,
@@ -191,7 +122,6 @@
 		93F1E92E142C5662005A297C /* Bugsnag Notifier Test */ = {
 			isa = PBXGroup;
 			children = (
-				93260F7315998A9B000F87AF /* JSON */,
 				93F1E957142C5A07005A297C /* Bugsnag_NotifierViewController.xib */,
 				93F1E959142C5A07005A297C /* MainWindow.xib */,
 				93F1E950142C59EA005A297C /* Bugsnag_NotifierAppDelegate.h */,
@@ -215,43 +145,51 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		93F1E968142C5A60005A297C /* Bugsnag Plugin */ = {
+		F4E0562016AA4CC50047503D /* Bugsnag Plugin */ = {
 			isa = PBXGroup;
 			children = (
-				93260F2615998A53000F87AF /* Bugsnag.h */,
-				93260F2715998A53000F87AF /* Bugsnag.m */,
-				F483048916717D9400310C2C /* BugsnagEvent.h */,
-				F483048A16717D9400310C2C /* BugsnagEvent.m */,
-				F483048F167184CF00310C2C /* BugsnagLogging.h */,
-				F483049E1671A6FC00310C2C /* BugsnagMetaData.h */,
-				F483049F1671A6FC00310C2C /* BugsnagMetaData.m */,
-				F483048516717D8800310C2C /* BugsnagNotifier.h */,
-				F483048616717D8800310C2C /* BugsnagNotifier.m */,
-				F48304A11671BA8300310C2C /* BugsnagPrivate.h */,
-				F483049216718D7B00310C2C /* NSDictionary+JSON.h */,
-				F483049316718D7B00310C2C /* NSDictionary+JSON.m */,
-				F483049B1671A04700310C2C /* NSMutableDictionary+Merge.h */,
-				F483049C1671A04700310C2C /* NSMutableDictionary+Merge.m */,
-				F48304A71671FB3D00310C2C /* NSNumber+Duration.h */,
-				F48304A81671FB3E00310C2C /* NSNumber+Duration.m */,
-				F483048C16717E0600310C2C /* NSNumber+FileSizes.h */,
-				F483048D16717E0600310C2C /* NSNumber+FileSizes.m */,
-				F4F3A0DA1678237D008CE078 /* Reachability.h */,
-				F4F3A0DB1678237D008CE078 /* Reachability.m */,
-				F483049816719C9800310C2C /* UIDevice+Stats.h */,
-				F483049916719C9800310C2C /* UIDevice+Stats.m */,
-				F483049516719C6100310C2C /* UIViewController+Visibility.h */,
-				F483049616719C6100310C2C /* UIViewController+Visibility.m */,
+				F4E0562116AA4CC50047503D /* Bugsnag.h */,
+				F4E0562216AA4CC50047503D /* Bugsnag.m */,
+				F4E0562316AA4CC50047503D /* BugsnagEvent.h */,
+				F4E0562416AA4CC50047503D /* BugsnagEvent.m */,
+				F4E0562516AA4CC50047503D /* BugsnagLogging.h */,
+				F4E0562616AA4CC50047503D /* BugsnagMetaData.h */,
+				F4E0562716AA4CC50047503D /* BugsnagMetaData.m */,
+				F4E0562816AA4CC50047503D /* BugsnagNotifier.h */,
+				F4E0562916AA4CC50047503D /* BugsnagNotifier.m */,
+				F4E0562A16AA4CC50047503D /* BugsnagPrivate.h */,
+				F4E0562B16AA4CC50047503D /* Categories */,
+				F4E0563816AA4CC50047503D /* Dependencies */,
 			);
-			name = "Bugsnag Plugin";
+			path = "Bugsnag Plugin";
 			sourceTree = "<group>";
 		};
-		F4F3A0F1167956EF008CE078 /* Unity */ = {
+		F4E0562B16AA4CC50047503D /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				F4F3A0F416795718008CE078 /* BugsnagUnity.mm */,
+				F4E0562C16AA4CC50047503D /* NSDictionary+BSJSON.h */,
+				F4E0562D16AA4CC50047503D /* NSDictionary+BSJSON.m */,
+				F4E0562E16AA4CC50047503D /* NSMutableDictionary+BSMerge.h */,
+				F4E0562F16AA4CC50047503D /* NSMutableDictionary+BSMerge.m */,
+				F4E0563016AA4CC50047503D /* NSNumber+BSDuration.h */,
+				F4E0563116AA4CC50047503D /* NSNumber+BSDuration.m */,
+				F4E0563216AA4CC50047503D /* NSNumber+BSFileSizes.h */,
+				F4E0563316AA4CC50047503D /* NSNumber+BSFileSizes.m */,
+				F4E0563416AA4CC50047503D /* UIDevice+BSStats.h */,
+				F4E0563516AA4CC50047503D /* UIDevice+BSStats.m */,
+				F4E0563616AA4CC50047503D /* UIViewController+BSVisibility.h */,
+				F4E0563716AA4CC50047503D /* UIViewController+BSVisibility.m */,
 			);
-			name = Unity;
+			path = Categories;
+			sourceTree = "<group>";
+		};
+		F4E0563816AA4CC50047503D /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				F4E0563916AA4CC50047503D /* Reachability.h */,
+				F4E0563A16AA4CC50047503D /* Reachability.m */,
+			);
+			path = Dependencies;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -307,6 +245,7 @@
 				93F1E95B142C5A07005A297C /* Bugsnag_NotifierViewController.xib in Resources */,
 				93F1E95C142C5A07005A297C /* MainWindow.xib in Resources */,
 				93F1E95F142C5A15005A297C /* InfoPlist.strings in Resources */,
+				F4A4859C16AA0E2500CAD26D /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,30 +259,17 @@
 				93F1E954142C59EA005A297C /* Bugsnag_NotifierAppDelegate.m in Sources */,
 				93F1E955142C59EA005A297C /* Bugsnag_NotifierViewController.m in Sources */,
 				93F1E961142C5A22005A297C /* main.m in Sources */,
-				93260F2815998A53000F87AF /* Bugsnag.m in Sources */,
-				93260F8D15998AA6000F87AF /* NSObject+SBJson.m in Sources */,
-				93260F8E15998AA6000F87AF /* SBJsonParser.m in Sources */,
-				93260F8F15998AA6000F87AF /* SBJsonStreamParser.m in Sources */,
-				93260F9015998AA6000F87AF /* SBJsonStreamParserAccumulator.m in Sources */,
-				93260F9115998AA6000F87AF /* SBJsonStreamParserAdapter.m in Sources */,
-				93260F9215998AA6000F87AF /* SBJsonStreamParserState.m in Sources */,
-				93260F9315998AA6000F87AF /* SBJsonStreamWriter.m in Sources */,
-				93260F9415998AA6000F87AF /* SBJsonStreamWriterAccumulator.m in Sources */,
-				93260F9515998AA6000F87AF /* SBJsonStreamWriterState.m in Sources */,
-				93260F9615998AA6000F87AF /* SBJsonTokeniser.m in Sources */,
-				93260F9715998AA6000F87AF /* SBJsonUTF8Stream.m in Sources */,
-				93260F9815998AA6000F87AF /* SBJsonWriter.m in Sources */,
-				F483048716717D8800310C2C /* BugsnagNotifier.m in Sources */,
-				F483048B16717D9400310C2C /* BugsnagEvent.m in Sources */,
-				F483048E16717E0600310C2C /* NSNumber+FileSizes.m in Sources */,
-				F483049416718D7B00310C2C /* NSDictionary+JSON.m in Sources */,
-				F483049716719C6100310C2C /* UIViewController+Visibility.m in Sources */,
-				F483049A16719C9800310C2C /* UIDevice+Stats.m in Sources */,
-				F483049D1671A04700310C2C /* NSMutableDictionary+Merge.m in Sources */,
-				F48304A01671A6FC00310C2C /* BugsnagMetaData.m in Sources */,
-				F48304A91671FB3E00310C2C /* NSNumber+Duration.m in Sources */,
-				F4F3A0DC1678237D008CE078 /* Reachability.m in Sources */,
-				F4F3A0F516795718008CE078 /* BugsnagUnity.mm in Sources */,
+				F4E0563B16AA4CC50047503D /* Bugsnag.m in Sources */,
+				F4E0563C16AA4CC50047503D /* BugsnagEvent.m in Sources */,
+				F4E0563D16AA4CC50047503D /* BugsnagMetaData.m in Sources */,
+				F4E0563E16AA4CC50047503D /* BugsnagNotifier.m in Sources */,
+				F4E0563F16AA4CC50047503D /* NSDictionary+BSJSON.m in Sources */,
+				F4E0564016AA4CC50047503D /* NSMutableDictionary+BSMerge.m in Sources */,
+				F4E0564116AA4CC50047503D /* NSNumber+BSDuration.m in Sources */,
+				F4E0564216AA4CC50047503D /* NSNumber+BSFileSizes.m in Sources */,
+				F4E0564316AA4CC50047503D /* UIDevice+BSStats.m in Sources */,
+				F4E0564416AA4CC50047503D /* UIViewController+BSVisibility.m in Sources */,
+				F4E0564516AA4CC50047503D /* Reachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,15 +353,19 @@
 		93F1E946142C5662005A297C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				COPY_PHASE_STRIP = NO;
 				DEPLOYMENT_POSTPROCESSING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = "Bugsnag Notifier";
 				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -443,15 +373,19 @@
 		93F1E947142C5662005A297C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				COPY_PHASE_STRIP = NO;
 				DEPLOYMENT_POSTPROCESSING = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Bugsnag Notifier Test/Bugsnag Notifier-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Bugsnag Notifier Test/Bugsnag Notifier-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = "Bugsnag Notifier";
 				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

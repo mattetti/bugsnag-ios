@@ -26,6 +26,6 @@
 @property (copy) NSString *apiKey;
 @property (nonatomic) BOOL enableSSL;
 @property (nonatomic) BOOL autoNotify;
-@property (nonatomic, retain) NSArray *notifyReleaseStages;
-@property (readonly) NSString *uuid;
+@property (nonatomic, strong) NSArray *notifyReleaseStages;
+@property (unsafe_unretained, readonly) NSString *uuid;
 @end

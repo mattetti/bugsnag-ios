@@ -8,10 +8,10 @@
 
 #import <execinfo.h>
 
-#import "NSMutableDictionary+Merge.h"
-#import "NSNumber+Duration.h"
-#import "UIDevice+Stats.h"
-#import "UIViewController+Visibility.h"
+#import "NSMutableDictionary+BSMerge.h"
+#import "NSNumber+BSDuration.h"
+#import "UIDevice+BSStats.h"
+#import "UIViewController+BSVisibility.h"
 
 #import "Reachability.h"
 #import "BugsnagEvent.h"
@@ -42,7 +42,7 @@
     if(errorPath) return errorPath;
     NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     NSString *filename = [folders count] == 0 ? NSTemporaryDirectory() : [folders objectAtIndex:0];
-    errorPath = [[filename stringByAppendingPathComponent:@"bugsnag"] retain];
+    errorPath = [filename stringByAppendingPathComponent:@"bugsnag"];
     return errorPath;
 }
 
@@ -83,7 +83,7 @@
                                  errorMessage:(NSString*)errorMessage
                                    stackTrace:(NSArray*)stacktrace
                                      metaData:(NSDictionary*)passedMetaData {
-    NSMutableDictionary *event = [[[NSMutableDictionary alloc] init] autorelease];
+    NSMutableDictionary *event = [[NSMutableDictionary alloc] init];
     
     @try {
         [event setObject:[Bugsnag instance].userId forKey:@"userId"];
@@ -94,9 +94,7 @@
         
         NSMutableDictionary *exceptionDetails = [[NSMutableDictionary alloc] init];
         NSArray *exceptions = [[NSArray alloc] initWithObjects:exceptionDetails, nil];
-        [exceptionDetails release];
         [event setObject:exceptions forKey:@"exceptions"];
-        [exceptions release];
         
         [exceptionDetails setObject:errorClass forKey:@"errorClass"];
         [exceptionDetails setObject:errorMessage forKey:@"message"];
@@ -104,7 +102,6 @@
         
         BugsnagMetaData *metaData = [[Bugsnag instance].metaData mutableCopy];
         [event setObject:metaData.dictionary forKey:@"metaData"];
-        [metaData autorelease];
         
         NSMutableDictionary *device = [metaData getTab:@"device"];
         
@@ -187,7 +184,6 @@
         }
         
         [backtrace addObject:lineDetails];
-        [lineDetails release];
 	}
 	free(strs);
     return backtrace;
