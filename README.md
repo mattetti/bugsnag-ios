@@ -40,10 +40,11 @@ pod install
 
 ### Manual Install
 
-- Clone the Bugsnag git repository
+- Download and unzip the latest version.
 
 ```bash
-git clone git://github.com/bugsnag/bugsnag-ios.git
+wget -O bugsnag.zip https://github.com/bugsnag/bugsnag-ios/zipball/master
+unzip bugsnag.zip
 ```
 
 - Include all files in the `Bugsnag Plugin` folder in your Xcode project.
