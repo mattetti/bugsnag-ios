@@ -90,7 +90,11 @@
         [event setObject:[Bugsnag instance].appVersion forKey:@"appVersion"];
         [event setObject:[UIDevice osVersion] forKey:@"osVersion"];
         [event setObject:[Bugsnag instance].releaseStage forKey:@"releaseStage"];
-        [event setObject:[Bugsnag instance].context forKey:@"context"];
+        
+        NSString *context = [Bugsnag instance].context;
+        if(context) {
+            [event setObject:[Bugsnag instance].context forKey:@"context"];
+        }
         
         NSMutableDictionary *exceptionDetails = [[NSMutableDictionary alloc] init];
         NSArray *exceptions = [[NSArray alloc] initWithObjects:exceptionDetails, nil];
@@ -129,8 +133,11 @@
         }
         
         NSMutableDictionary *application = [metaData getTab:@"application"];
-        
-        [application setObject:NSStringFromClass([[UIViewController getVisible] class]) forKey:@"Top View Comtroller"];
+
+        NSString *topViewControllerName = NSStringFromClass([[UIViewController getVisible] class]);
+        if(topViewControllerName) {
+            [application setObject:topViewControllerName forKey:@"Top View Controller"];
+        }
         [application setObject:[Bugsnag instance].appVersion forKey:@"App Version"];
         [application setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"Bundle Identifier"];
         
