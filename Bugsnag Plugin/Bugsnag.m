@@ -218,6 +218,10 @@ void handle_exception(NSException *exception) {
 - (NSString*) uuid {
     @synchronized(self) {
         if(_uuid) return [_uuid copy];
+        if([[UIDevice currentDevice] respondsToSelector:@selector(identifierForVendor)]) {
+            _uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+            return [_uuid copy];
+        }
         NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         if([folders count]) {
             NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
