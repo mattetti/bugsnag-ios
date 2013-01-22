@@ -1,6 +1,13 @@
 Changelog
 =========
 
+2.2.1
+------
+
+-   Fix for notifying when no View Controller is on screen
+-   Use identifierForVendor when supported for userId.
+
+
 2.2.0
 ------
 
