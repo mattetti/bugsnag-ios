@@ -1,7 +1,7 @@
 Bugsnag Notifier for iOS
 ========================
 
-The Bugsnag Notifier for iOS gives you instant notification of exceptions thrown from your iOS applications. 
+The Bugsnag Notifier for iOS gives you instant notification of exceptions thrown from your iOS applications.
 The notifier hooks into `NSSetUncaughtExceptionHandler`, which means any uncaught exceptions will trigger a notification to be sent to your Bugsnag project. Bugsnag will also monitor for fatal signals sent to your application, for example a Segmentation Fault.
 
 [Bugsnag](http://bugsnag.com) captures errors in real-time from your web, mobile and desktop applications, helping you to understand and resolve them as fast as possible. [Create a free account](http://bugsnag.com) to start capturing exceptions from your applications.
@@ -69,7 +69,7 @@ Since version 2.2.0 Bugsnag has fully supported Arc. If you wish to run a non-Ar
 
 If you are using Bugsnag 2.2.0 or newer in your non-arc project, you will need to set a `-fobjc-arc` compiler flag on all of the Bugsnag source files. Conversely, if you are adding a pre-2.2.0 version of Bugsnag, you will need to set a `-fno-objc-arc` compiler flag.
 
-To set a compiler flag in Xcode, go to your active target and select the "Build Phases" tab. Now select all Bugsnag source files, press Enter, insert `-fobjc-arc` or `-fno-objc-arc` and then "Done" to enable or disable ARC for Bugsnag. 
+To set a compiler flag in Xcode, go to your active target and select the "Build Phases" tab. Now select all Bugsnag source files, press Enter, insert `-fobjc-arc` or `-fno-objc-arc` and then "Done" to enable or disable ARC for Bugsnag.
 
 JSON Library
 ------------
@@ -96,7 +96,7 @@ If you would like to send non-fatal exceptions to Bugsnag, you can pass any `NSE
 You can also send additional meta-data with your exception:
 
 ```objective-c
-[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil] 
+[Bugsnag notify:[NSException exceptionWithName:@"ExceptionName" reason:@"Something bad happened" userInfo:nil]
        withData:[NSDictionary dictionaryWithObjectsAndKeys:@"username", @"bob-hoskins", nil]];
 ```
 
@@ -138,7 +138,7 @@ Bugsnag uses the concept of "contexts" to help display and group your errors. Co
 ###userId
 
 Bugsnag helps you understand how many of your users are affected by each error. In order to do this, we send along a userId with every exception. By default we will generate a unique ID and send this ID along with every exception from an individual device.
-    
+
 If you would like to override this `userId`, for example to set it to be a username of your currently logged in user, you can set the `userId` property:
 
 ```objective-c
@@ -156,7 +156,7 @@ In order to distinguish between errors that occur in different stages of the app
 ###notifyReleaseStages
 
 By default, we will only notify Bugsnag of exceptions that happen when your `releaseStage` is set to be either "production" or "development". If you would like to change which release stages notify Bugsnag of exceptions you can set the `notifyReleaseStages` property:
-    
+
 ```objective-c
 [Bugsnag instance].notifyReleaseStages = [NSArray arrayWithObjects:@"production", nil];
 ```
@@ -164,14 +164,14 @@ By default, we will only notify Bugsnag of exceptions that happen when your `rel
 ###autoNotify
 
 By default, we will automatically notify Bugsnag of any fatal exceptions in your application. If you want to stop this from happening, you can set `autoNotify` to NO:
-    
+
 ```objective-c
 [Bugsnag instance].autoNotify = NO;
 ```
 
 ###enableSSL
 
-Enables the use of SSL encryption when sending errors to Bugsnag. Enable this if you require the extra security
+By default, we will enables the use of SSL encryption when sending errors to Bugsnag. If you want to use a unencrypted connection to bugsnag, you can set `enableSSL` to NO:
 
 ```objective-c
 [Bugsnag instance].enableSSL = NO;
