@@ -171,7 +171,7 @@ By default, we will automatically notify Bugsnag of any fatal exceptions in your
 
 ###enableSSL
 
-By default, we will enables the use of SSL encryption when sending errors to Bugsnag. If you want to use a unencrypted connection to bugsnag, you can set `enableSSL` to NO:
+By default, Bugsnag enables the use of SSL encryption when sending errors to Bugsnag. If you want to use an unencrypted connection to Bugsnag, you can set `enableSSL` to NO:
 
 ```objective-c
 [Bugsnag instance].enableSSL = NO;
