@@ -136,7 +136,7 @@
 
         NSString *topViewControllerName = NSStringFromClass([[UIViewController getVisible] class]);
         if(topViewControllerName) {
-            [application setObject:topViewControllerName forKey:@"Top View Comtroller"];
+            [application setObject:topViewControllerName forKey:@"Top View Controller"];
         }
         [application setObject:[Bugsnag instance].appVersion forKey:@"App Version"];
         [application setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"Bundle Identifier"];
