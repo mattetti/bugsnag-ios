@@ -217,38 +217,46 @@ void handle_exception(NSException *exception) {
 
 - (NSString*) uuid {
     @synchronized(self) {
+        // Return the already determined the UUID
         if(_uuid) return [_uuid copy];
+
+        // Try to read UUID from disk
+        NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+        if([folders count]) {
+            NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
+            _uuid = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+            if(_uuid) {
+                return [_uuid copy];
+            }
+        }
+
+        // Try to read UUID from NSUserDefaults
+        _uuid = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
+        if(_uuid) {
+            return [_uuid copy];
+        }
+
+        // Try to read Apple UUID for Vendor
         if([[UIDevice currentDevice] respondsToSelector:@selector(identifierForVendor)]) {
             _uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
             return [_uuid copy];
         }
-        NSArray *folders = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+
+        // Generate a fresh UUID
+        CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+        _uuid = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuid));
+        CFRelease(uuid);
+
+        // Try to save the UUID to disk
         if([folders count]) {
             NSString *filename = [[folders objectAtIndex:0] stringByAppendingPathComponent:@"bugsnag-user-id"];
-            
-            _uuid = [NSString stringWithContentsOfFile:filename encoding:NSStringEncodingConversionExternalRepresentation error:nil];
-            if(_uuid) {
-                return [_uuid copy];
-            } else {
-                CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-                _uuid = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuid));
-                CFRelease(uuid);
-                
-                [_uuid writeToFile:filename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
-                return [_uuid copy];
-            }
-        } else {
-            _uuid = [[NSUserDefaults standardUserDefaults] stringForKey:@"bugsnag-user-id"];
-            if(_uuid) {
-                return [_uuid copy];
-            } else {
-                CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
-                _uuid = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuid));
-                CFRelease(uuid);
-                [[NSUserDefaults standardUserDefaults] setValue:_uuid forKey:@"bugsnag-user-id"];
-                return [_uuid copy];
-            }
+            [_uuid writeToFile:filename atomically:YES encoding:NSStringEncodingConversionExternalRepresentation error:nil];
+            return [_uuid copy];
         }
+
+        // Try to save the UUID to the NSUserDefaults
+        [[NSUserDefaults standardUserDefaults] setValue:_uuid forKey:@"bugsnag-user-id"];
+        return [_uuid copy];
     }
 }
 
