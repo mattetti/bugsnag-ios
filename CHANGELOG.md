@@ -1,6 +1,13 @@
 Changelog
 =========
 
+2.2.2
+------
+
+-   Ensure that we read UUID from legacy locations to prevent duplicates
+-   Prefer to write/read UUID from NSUserdefaults
+
+
 2.2.1
 ------
 
