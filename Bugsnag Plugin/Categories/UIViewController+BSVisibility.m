@@ -28,7 +28,7 @@
         
         UIViewController *presentedViewController = nil;
         
-        if(([viewController respondsToSelector:@selector(presentedViewController)])) {
+        if ([viewController respondsToSelector:@selector(presentedViewController)]) {
             presentedViewController = viewController.presentedViewController;
         } else {
             presentedViewController = [viewController performSelector:@selector(modalViewController)];
