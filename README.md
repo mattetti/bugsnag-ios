@@ -177,6 +177,18 @@ By default, Bugsnag enables the use of SSL encryption when sending errors to Bug
 [Bugsnag instance].enableSSL = NO;
 ```
 
+Stacktrace Information
+----------------------
+
+In order for the stacktrace information to be included with the bug reports on Bugsnag, the following settings should be
+configured.
+
+- Deployment Postprocessing: Off
+- Strip debug symbols during copy: Off
+- Strip linked product: Off
+
+**Note:** This will increase the size of the application slightly.
+
 
 Reporting Bugs or Feature Requests
 ----------------------------------
