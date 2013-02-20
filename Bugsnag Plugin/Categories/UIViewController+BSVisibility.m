@@ -25,14 +25,23 @@
     
     while (visibleViewController == nil && tries <= 30 && viewController) {
         tries++;
-        if (viewController.modalViewController == nil) {
+        
+        UIViewController *presentedViewController = nil;
+        
+        if ([viewController respondsToSelector:@selector(modalViewController)]) {
+            presentedViewController = [viewController performSelector:@selector(modalViewController)];
+        } else if(([viewController respondsToSelector:@selector(presentedViewController)])) {
+            presentedViewController = [viewController performSelector:@selector(presentedViewController)];
+        }
+        
+        if (presentedViewController == nil) {
             visibleViewController = viewController;
         } else {
-            if ([viewController.modalViewController isKindOfClass:[UINavigationController class]]) {
-                UINavigationController *navigationController = (UINavigationController *)viewController.modalViewController;
+            if ([presentedViewController isKindOfClass:[UINavigationController class]]) {
+                UINavigationController *navigationController = (UINavigationController *)presentedViewController;
                 viewController = navigationController.visibleViewController;
             } else {
-                viewController = viewController.modalViewController;
+                viewController = presentedViewController;
             }
         }
     }
