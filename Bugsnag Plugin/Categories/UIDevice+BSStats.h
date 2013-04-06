@@ -6,7 +6,10 @@
 //
 //
 
-#import <UIKit/UIKit.h>
+#if !TARGET_OS_IPHONE
+@interface UIDevice
+@end
+#endif
 
 @interface UIDevice (BSStats)
 + (NSString*) platform;

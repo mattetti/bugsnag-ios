@@ -6,6 +6,7 @@
 //
 //
 
+#if TARGET_OS_IPHONE
 #import "UIViewController+BSVisibility.h"
 
 @implementation UIViewController (BSVisibility)
@@ -49,3 +50,4 @@
     return visibleViewController;
 }
 @end
+#endif

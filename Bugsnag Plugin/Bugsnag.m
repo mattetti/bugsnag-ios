@@ -6,7 +6,9 @@
 #import <Foundation/Foundation.h>
 #import <mach/mach.h>
 
+#if TARGET_OS_IPHONE
 #import "UIViewController+BSVisibility.h"
+#endif
 
 #import "Bugsnag.h"
 #import "BugsnagEvent.h"
@@ -150,9 +152,10 @@ void handle_exception(NSException *exception) {
 #else
         self.releaseStage = @"production";
 #endif
-        
+        #if TARGET_OS_IPHONE
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        #endif
     }
     return self;
 }
@@ -205,7 +208,11 @@ void handle_exception(NSException *exception) {
 - (NSString*) context {
     @synchronized(self) {
         if(_context) return [_context copy];
+        #if TARGET_OS_IPHONE
         return NSStringFromClass([[UIViewController getVisible] class]);
+        #else
+        return nil;
+        #endif
     }
 }
 
@@ -240,6 +247,7 @@ void handle_exception(NSException *exception) {
             }
         }
 
+        #if TARGET_OS_IPHONE
         // Try to read Apple UUID for Vendor
         if([[UIDevice currentDevice] respondsToSelector:@selector(identifierForVendor)]) {
             _uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -250,6 +258,7 @@ void handle_exception(NSException *exception) {
             [defaults synchronize];
             return [_uuid copy];
         }
+        #endif
 
         // Generate a fresh UUID
         CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);

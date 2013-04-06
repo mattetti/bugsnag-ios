@@ -14,6 +14,11 @@
 #import "NSNumber+BSFileSizes.h"
 #import "UIDevice+BSStats.h"
 
+#if !TARGET_OS_IPHONE
+@implementation UIDevice
+@end
+#endif
+
 @implementation UIDevice (BSStats)
 
 + (NSString*) platform {
@@ -67,6 +72,10 @@
 #else
 #ifdef __i386__
     NSString *arch = @"i386";
+#else
+#ifdef __x86_64__
+    NSString *arch = @"x86_64";
+#endif
 #endif
 #endif
 #endif

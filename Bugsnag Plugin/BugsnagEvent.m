@@ -11,9 +11,12 @@
 #import "NSMutableDictionary+BSMerge.h"
 #import "NSNumber+BSDuration.h"
 #import "UIDevice+BSStats.h"
-#import "UIViewController+BSVisibility.h"
 
+#if TARGET_OS_IPHONE
+#import "UIViewController+BSVisibility.h"
 #import "Reachability.h"
+#endif
+
 #import "BugsnagEvent.h"
 #import "Bugsnag.h"
 #import "BugsnagLogging.h"
@@ -114,6 +117,7 @@
         [device setObject:[UIDevice osVersion] forKey:@"iOS Version"];
         [device setObject:[[UIDevice uptime] durationString] forKey:@"Time since boot"];
         
+        #if TARGET_OS_IPHONE
         Reachability *reachability = [Reachability reachabilityForInternetConnection];
         [reachability startNotifier];
         NetworkStatus status = [reachability currentReachabilityStatus];
@@ -126,6 +130,7 @@
         } else if (status == ReachableViaWWAN) {
             [device setObject:@"Reachable via Mobile" forKey:@"Network"];
         }
+        #endif
         
         NSDictionary *memoryStats = [UIDevice memoryStats];
         if(memoryStats) {
@@ -133,11 +138,14 @@
         }
         
         NSMutableDictionary *application = [metaData getTab:@"application"];
-
+        
+        #if TARGET_OS_IPHONE
         NSString *topViewControllerName = NSStringFromClass([[UIViewController getVisible] class]);
         if(topViewControllerName) {
             [application setObject:topViewControllerName forKey:@"Top View Controller"];
         }
+        #endif
+        
         [application setObject:[Bugsnag instance].appVersion forKey:@"App Version"];
         [application setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"Bundle Identifier"];
         

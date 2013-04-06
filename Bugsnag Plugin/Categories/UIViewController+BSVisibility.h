@@ -6,8 +6,10 @@
 //
 //
 
+#if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
 
 @interface UIViewController (BSVisibility)
 + (UIViewController *)getVisible;
 @end
+#endif
