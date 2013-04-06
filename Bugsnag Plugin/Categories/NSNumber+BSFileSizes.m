@@ -10,17 +10,17 @@
 
 @implementation NSNumber (BSFileSizes)
 - (NSString *)fileSize {
-    float fileSize = [self floatValue];
-    if (fileSize<1023.0f)
-        return([NSString stringWithFormat:@"%i bytes",[self intValue]]);
-    fileSize = fileSize / 1024.0f;
-    if ([self intValue]<1023.0f)
-        return([NSString stringWithFormat:@"%1.1f KB",fileSize]);
-    fileSize = fileSize / 1024.0f;
-    if (fileSize<1023.0f)
-        return([NSString stringWithFormat:@"%1.1f MB",fileSize]);
-    fileSize = fileSize / 1024.0f;
+    double fileSize = [self doubleValue];
+    if (fileSize<1023.0)
+        return [NSString stringWithFormat:@"%i bytes",[self intValue]];
+    fileSize = fileSize / 1024.0;
+    if (fileSize<1023.0)
+        return [NSString stringWithFormat:@"%1.1f KB",fileSize];
+    fileSize = fileSize / 1024.0;
+    if (fileSize<1023.0)
+        return [NSString stringWithFormat:@"%1.1f MB",fileSize];
+    fileSize = fileSize / 1024.0;
     
-    return([NSString stringWithFormat:@"%1.1f GB",fileSize]);
+    return [NSString stringWithFormat:@"%1.1f GB",fileSize];
 }
 @end

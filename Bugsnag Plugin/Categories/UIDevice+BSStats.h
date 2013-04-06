@@ -6,7 +6,8 @@
 //
 //
 
-#import <UIKit/UIKit.h>
+@interface UIDevice : NSObject
+@end
 
 @interface UIDevice (BSStats)
 + (NSString*) platform;

@@ -21,43 +21,39 @@
     int entries = 0;
     
     if (conversionInfo.year) {
-        [result appendFormat:@"%d years", conversionInfo.year];
+        [result appendFormat:@"%ld years", (long)conversionInfo.year];
         entries++;
     }
     
     if (entries < 2 && conversionInfo.month) {
-        if (entries == 0) {
-            [result appendFormat:@"%d months", conversionInfo.month];
-        } else {
-            [result appendFormat:@" and %d months", conversionInfo.month];
+        if (entries != 0) {
+            [result appendFormat:@" and "];
         }
+        [result appendFormat:@"%ld months", (long)conversionInfo.month];
         entries++;
     }
     
     if (entries < 2 && conversionInfo.day) {
-        if (entries == 0) {
-            [result appendFormat:@"%d days", conversionInfo.day];
-        } else {
-            [result appendFormat:@" and %d days", conversionInfo.day];
+        if (entries != 0) {
+            [result appendFormat:@" and "];
         }
+        [result appendFormat:@"%ld days", (long)conversionInfo.day];
         entries++;
     }
     
     if (entries < 2 && conversionInfo.minute) {
-        if (entries == 0) {
-            [result appendFormat:@"%d minutes", conversionInfo.minute];
-        } else {
-            [result appendFormat:@" and %d minutes", conversionInfo.minute];
+        if (entries != 0) {
+            [result appendFormat:@" and "];
         }
+        [result appendFormat:@"%ld minutes", (long)conversionInfo.minute];
         entries++;
     }
     
     if (entries < 2 && conversionInfo.second) {
-        if (entries == 0) {
-            [result appendFormat:@"%d seconds", conversionInfo.second];
-        } else {
-            [result appendFormat:@" and %d seconds", conversionInfo.second];
+        if (entries != 0) {
+            [result appendFormat:@" and "];
         }
+        [result appendFormat:@"%ld seconds", (long)conversionInfo.second];
         entries++;
     }
     

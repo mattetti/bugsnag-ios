@@ -13,19 +13,14 @@
 #import "NSDictionary+BSJSON.h"
 #import "BugsnagPrivate.h"
 
-#define BUGSNAG_IOS_VERSION @"2.2.3"
-#define BUGSNAG_IOS_HOMEPAGE @"https://github.com/bugsnag/bugsnag-ios"
+#define BUGSNAG_OSX_VERSION @"2.2.3"
+#define BUGSNAG_OSX_HOMEPAGE @"https://github.com/bugsnag/bugsnag-osx"
 
-static NSString *notifierName = @"iOS Bugsnag Notifier";
-static NSString *notifierVersion = BUGSNAG_IOS_VERSION;
-static NSString *notifierURL = BUGSNAG_IOS_HOMEPAGE;
+static NSString *notifierName = @"OSX Bugsnag Notifier";
+static NSString *notifierVersion = BUGSNAG_OSX_VERSION;
+static NSString *notifierURL = BUGSNAG_OSX_HOMEPAGE;
 
 @implementation BugsnagNotifier
-
-+ (void) setUnityNotifier {
-    notifierName = @"iOS Unity Notifier";
-    notifierURL = @"https://github.com/bugsnag/bugsnag-unity";
-}
 
 + (NSDictionary*) getNotifyPayload {
     NSDictionary *notifier = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObjects: notifierName, notifierVersion, notifierURL, nil]
@@ -38,7 +33,6 @@ static NSString *notifierURL = BUGSNAG_IOS_HOMEPAGE;
 
 + (void) backgroundNotifyAndSend:(NSDictionary*)event {
     @autoreleasepool {
-    
         [BugsnagEvent writeEventToDisk:event];
         [self sendCachedReports];
     
@@ -86,9 +80,9 @@ static NSString *notifierURL = BUGSNAG_IOS_HOMEPAGE;
                         NSURLResponse* response = nil;
                         [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
                         
-                        int statusCode = [((NSHTTPURLResponse *)response) statusCode];
+                        long statusCode = [((NSHTTPURLResponse *)response) statusCode];
                         if (statusCode != 200) {
-                            BugLog(@"Bad response from bugsnag received: %d.", statusCode);
+                            BugLog(@"Bad response from bugsnag received: %ld.", statusCode);
                         }
                         
                         for(NSString *file in sentFilenames) {

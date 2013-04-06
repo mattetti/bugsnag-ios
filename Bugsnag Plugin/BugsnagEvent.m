@@ -11,9 +11,7 @@
 #import "NSMutableDictionary+BSMerge.h"
 #import "NSNumber+BSDuration.h"
 #import "UIDevice+BSStats.h"
-#import "UIViewController+BSVisibility.h"
 
-#import "Reachability.h"
 #import "BugsnagEvent.h"
 #import "Bugsnag.h"
 #import "BugsnagLogging.h"
@@ -71,7 +69,7 @@
     for (NSInteger i = 0; i < frameCount; i++) {
         frames[i] = (void *)[[[exception callStackReturnAddresses] objectAtIndex:i] unsignedIntegerValue];
     }
-    NSArray *stacktrace = [BugsnagEvent getCallStackFromFrames:frames andCount:frameCount startingAt:0];
+    NSArray *stacktrace = [BugsnagEvent getCallStackFromFrames:frames andCount:(int)frameCount startingAt:0];
     
     return [self generateEventFromErrorClass:exception.name
                                 errorMessage:exception.reason
@@ -109,42 +107,14 @@
         
         NSMutableDictionary *device = [metaData getTab:@"device"];
         
-        [device setObject:[UIDevice platform] forKey:@"Device"];
         [device setObject:[UIDevice arch] forKey:@"Architecture"];
-        [device setObject:[UIDevice osVersion] forKey:@"iOS Version"];
+        [device setObject:[UIDevice osVersion] forKey:@"OSX Version"];
         [device setObject:[[UIDevice uptime] durationString] forKey:@"Time since boot"];
         
-        Reachability *reachability = [Reachability reachabilityForInternetConnection];
-        [reachability startNotifier];
-        NetworkStatus status = [reachability currentReachabilityStatus];
-        [reachability stopNotifier];
-        
-        if(status == NotReachable) {
-            [device setObject:@"Not Reachable" forKey:@"Network"];
-        } else if (status == ReachableViaWiFi) {
-            [device setObject:@"Reachable via WiFi" forKey:@"Network"];
-        } else if (status == ReachableViaWWAN) {
-            [device setObject:@"Reachable via Mobile" forKey:@"Network"];
-        }
-        
-        NSDictionary *memoryStats = [UIDevice memoryStats];
-        if(memoryStats) {
-            [device setObject:memoryStats forKey:@"Memory"];
-        }
-        
         NSMutableDictionary *application = [metaData getTab:@"application"];
-
-        NSString *topViewControllerName = NSStringFromClass([[UIViewController getVisible] class]);
-        if(topViewControllerName) {
-            [application setObject:topViewControllerName forKey:@"Top View Controller"];
-        }
+        
         [application setObject:[Bugsnag instance].appVersion forKey:@"App Version"];
         [application setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:@"Bundle Identifier"];
-        
-        NSMutableDictionary *session = [metaData getTab:@"session"];
-        
-        [session setObject:[[Bugsnag instance].sessionLength durationString] forKey:@"Session Length"];
-        [session setObject:[NSNumber numberWithBool:[Bugsnag instance].inForeground] forKey:@"In Foreground"];
         
         if(passedMetaData) {
             [metaData mergeWith:passedMetaData];
@@ -178,7 +148,7 @@
             NSString *file = [packageName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             NSString *lineNumber = [entry substringWithRange:[firstMatch rangeAtIndex:2]];
             
-            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] && ![method hasPrefix:@"+[Bugsnag "] && ![method hasPrefix:@"+[BugsnagEvent "]) {
+            if ( [packageName isEqualToString:[[NSProcessInfo processInfo] processName]] && ![method hasPrefix:@"+[Bugsnag "] && ![method hasPrefix:@"+[BugsnagEvent "] && ![method hasPrefix:@"-[Bugsnag"]) {
                 [lineDetails setObject:[NSNumber numberWithBool:YES] forKey:@"inProject"];
             }
             [lineDetails setObject:method forKey:@"method"];

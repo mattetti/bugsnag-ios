@@ -6,7 +6,7 @@
 #import <Foundation/Foundation.h>
 #import <mach/mach.h>
 
-#import "UIViewController+BSVisibility.h"
+#import <ExceptionHandling/NSExceptionHandler.h>
 
 #import "Bugsnag.h"
 #import "BugsnagEvent.h"
@@ -55,6 +55,7 @@ void handle_signal(int signalReceived) {
                                                                metaData:nil];
         
         [BugsnagEvent writeEventToDisk:event];
+        [BugsnagNotifier sendCachedReports];
     }
     //Propagate the signal back up to take the app down
     raise(signalReceived);
@@ -63,11 +64,7 @@ void handle_signal(int signalReceived) {
 // Handles an uncaught exception
 void handle_exception(NSException *exception) {
     if (sharedBugsnagNotifier && [sharedBugsnagNotifier shouldAutoNotify]) {
-        remove_handlers();
-        
-        NSDictionary *event = [BugsnagEvent generateEventFromException:exception withMetaData:nil];
-        
-        [BugsnagEvent writeEventToDisk:event];
+        [Bugsnag notify:exception];
     }
 }
 
@@ -82,7 +79,7 @@ void handle_exception(NSException *exception) {
 
 // The start function. Entry point that should be called early on in application load
 + (void) startBugsnagWithApiKey:(NSString*)apiKey {
-    NSLog(@"Starting the Bugsnag iOS Notifier!");
+    NSLog(@"Starting the Bugsnag OSX Notifier!");
     [self instance].apiKey = apiKey;
     [BugsnagNotifier performSelectorInBackground:@selector(backgroundSendCachedReports) withObject:nil];
 }
@@ -138,6 +135,9 @@ void handle_exception(NSException *exception) {
         
         NSSetUncaughtExceptionHandler(&handle_exception);
         
+        [[NSExceptionHandler defaultExceptionHandler] setExceptionHandlingMask:NSLogAndHandleEveryExceptionMask];
+        [[NSExceptionHandler defaultExceptionHandler] setDelegate:self];
+        
         for (NSUInteger i = 0; i < signals_count; i++) {
             int signalType = signals[i];
             if (signal(signalType, handle_signal) != 0) {
@@ -150,9 +150,6 @@ void handle_exception(NSException *exception) {
 #else
         self.releaseStage = @"production";
 #endif
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     }
     return self;
 }
@@ -205,7 +202,7 @@ void handle_exception(NSException *exception) {
 - (NSString*) context {
     @synchronized(self) {
         if(_context) return [_context copy];
-        return NSStringFromClass([[UIViewController getVisible] class]);
+        return nil;
     }
 }
 
@@ -240,17 +237,6 @@ void handle_exception(NSException *exception) {
             }
         }
 
-        // Try to read Apple UUID for Vendor
-        if([[UIDevice currentDevice] respondsToSelector:@selector(identifierForVendor)]) {
-            _uuid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-            
-            // We always check NSUserdefaults so we write the user id here for performance reasons
-            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-            [defaults setValue:_uuid forKey:@"bugsnag-user-id"];
-            [defaults synchronize];
-            return [_uuid copy];
-        }
-
         // Generate a fresh UUID
         CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
         _uuid = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuid));
@@ -268,12 +254,11 @@ void handle_exception(NSException *exception) {
     return [NSNumber numberWithInt:-(int)[self.sessionStartDate timeIntervalSinceNow]];
 }
 
-- (void)applicationDidBecomeActive:(NSNotification *)notif {
-    [BugsnagNotifier performSelectorInBackground:@selector(backgroundSendCachedReports) withObject:nil];
-    self.inForeground = YES;
+- (BOOL)exceptionHandler:(NSExceptionHandler *)sender shouldLogException:(NSException *)exception mask:(NSUInteger)aMask {
+    if(sharedBugsnagNotifier && [sharedBugsnagNotifier shouldAutoNotify]) {
+        [Bugsnag notify:exception];
+    }
+    return NO;
 }
 
-- (void)applicationDidEnterBackground:(NSNotification *)notif {
-    self.inForeground = NO;
-}
 @end
