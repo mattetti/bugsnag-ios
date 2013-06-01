@@ -10,10 +10,13 @@ Pod::Spec.new do |s|
   s.source_files = ['Bugsnag Plugin', 'Bugsnag Plugin/Categories']
   s.requires_arc = true
 
-  s.public_header_files = 'Bugsnag Plugin/Bugsnag.h'
+  s.private_header_files = [
+    'Bugsnag Plugin/BugsnagPrivate.h',
+    'Bugsnag Plugin/BugsnagEvent.h',
+    'Bugsnag Plugin/BugsnagMetaData.h',
+    'Bugsnag Plugin/BugsnagNotifier.h',
+  ]
   s.framework  = 'SystemConfiguration'
   
-  # Finally, specify any Pods that this Pod depends on.
-  #
   s.dependency 'Reachability', '~> 3.1'
 end
