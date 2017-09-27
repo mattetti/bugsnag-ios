@@ -10,7 +10,7 @@ The notifier hooks into `NSSetUncaughtExceptionHandler`, which means any uncaugh
 Installation & Setup
 --------------------
 
-###CocoaPods (Recommended)
+### CocoaPods (Recommended)
 
 [Cocoapods](http://cocoapods.org/) is a library management system for iOS which allows you to manage your libraries, detail your dependencies and handle updates nicely. It is the recommended way of installing the Bugsnag iOS library.
 
@@ -29,7 +29,7 @@ pod install
 - Import the `Bugsnag.h` file into your application delegate.
 
 ```objective-c
-#import "Bugsnag.h"
+# import "Bugsnag.h"
 ```
 
 - In your application:didFinishLaunchingWithOptions: method, register with bugsnag by calling,
@@ -54,7 +54,7 @@ unzip bugsnag.zip
 - Import the `Bugsnag.h` file into your application delegate.
 
 ```objective-c
-#import "Bugsnag.h"
+# import "Bugsnag.h"
 ```
 
 - In your application:didFinishLaunchingWithOptions: method, register with bugsnag by calling,
@@ -63,7 +63,7 @@ unzip bugsnag.zip
 [Bugsnag startBugsnagWithApiKey:@"your-api-key-goes-here"];
 ```
 
-###ARC Support
+### ARC Support
 
 Since version 2.2.0 Bugsnag has fully supported Arc. If you wish to run a non-Arc build of Bugsnag you should use version 2.1.0 or older.
 
@@ -127,7 +127,7 @@ or you can clear the entire tab:
 Configuration
 -------------
 
-###context
+### context
 
 Bugsnag uses the concept of "contexts" to help display and group your errors. Contexts represent what was happening in your application at the time an error occurs. The iOS Notifier will set this to be the top most UIViewController, but if in a certain case you need to override the context, you can do so using this property:
 
@@ -135,7 +135,7 @@ Bugsnag uses the concept of "contexts" to help display and group your errors. Co
 [Bugsnag instance].context = @"MyUIViewController";
 ```
 
-###userId
+### userId
 
 Bugsnag helps you understand how many of your users are affected by each error. In order to do this, we send along a userId with every exception. By default we will generate a unique ID and send this ID along with every exception from an individual device.
 
@@ -145,7 +145,7 @@ If you would like to override this `userId`, for example to set it to be a usern
 [Bugsnag instance].userId = @"leeroy-jenkins";
 ```
 
-###releaseStage
+### releaseStage
 
 In order to distinguish between errors that occur in different stages of the application release process a release stage is sent to Bugsnag when an error occurs. This is automatically configured by the iOS notifier to be "production", unless DEBUG is defined during compilation. In this case it will be set to "development". If you wish to override this, you can do so by setting the releaseStage property manually:
 
@@ -153,7 +153,7 @@ In order to distinguish between errors that occur in different stages of the app
 [Bugsnag instance].releaseStage = @"development";
 ```
 
-###notifyReleaseStages
+### notifyReleaseStages
 
 By default, we will only notify Bugsnag of exceptions that happen when your `releaseStage` is set to be either "production" or "development". If you would like to change which release stages notify Bugsnag of exceptions you can set the `notifyReleaseStages` property:
 
@@ -161,7 +161,7 @@ By default, we will only notify Bugsnag of exceptions that happen when your `rel
 [Bugsnag instance].notifyReleaseStages = [NSArray arrayWithObjects:@"production", nil];
 ```
 
-###autoNotify
+### autoNotify
 
 By default, we will automatically notify Bugsnag of any fatal exceptions in your application. If you want to stop this from happening, you can set `autoNotify` to NO:
 
@@ -169,7 +169,7 @@ By default, we will automatically notify Bugsnag of any fatal exceptions in your
 [Bugsnag instance].autoNotify = NO;
 ```
 
-###enableSSL
+### enableSSL
 
 By default, Bugsnag enables the use of SSL encryption when sending errors to Bugsnag. If you want to use an unencrypted connection to Bugsnag, you can set `enableSSL` to NO:
 
